@@ -49,3 +49,11 @@ Para que la aplicación generada funcione correctamente, es necesario modificar 
     <!-- Versiones 2.7.0, 2.7.15 y 2.7.16 dan un error al persistir-->
 </parent>
 ```
+
+Para ejecutar la aplicación basta con ejecutar el script "launch.sh" del proyecto gestorconsentimientos-service:
+
+```shell
+./launch.sh clean install
+```
+Se puede comprobar el funcionamiento de la aplicación desde la url "http://localhost:8090/".
+
