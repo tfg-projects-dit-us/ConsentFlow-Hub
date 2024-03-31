@@ -6,7 +6,16 @@
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>gestorconsentimientos-service</name>
-  
+
+  <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>2.6.15</version>
+      <!-- Referencia de la versión 2.6.15: https://docs.spring.io/spring-boot/docs/2.6.15/reference/htmlsingle/ -->
+      <!-- Versión 2.6.15 es la más actual con la que todo funciona, con fecha 6/10/23 -->
+      <!-- Versiones 2.7.0, 2.7.15 y 2.7.16 dan un error al persistir-->
+  </parent>
+
   <properties>
     <version.org.kie>7.74.1.Final</version.org.kie>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -66,7 +75,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>2.5.15</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -75,9 +83,7 @@
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.5.15</version>
-        
+        <artifactId>spring-boot-maven-plugin</artifactId>      
       </plugin>
     </plugins>
   </build>
