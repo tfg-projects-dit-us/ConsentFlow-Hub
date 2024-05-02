@@ -1,0 +1,130 @@
+package us.dit.gestorconsentimientos.service.controllers;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
+import us.dit.gestorconsentimientos.service.services.kie.KieManagementService;
+
+
+/**
+ * Controlador que va a atender las operaciones sobre el recurso "/management/processInstances".
+ * 
+ * @author Javier
+ */
+@Controller
+@ResponseBody
+public class ManagementController {
+
+	private static final Logger logger = LogManager.getLogger();
+
+    @Autowired
+    KieConsentService kieConsentService;
+
+    @Autowired
+    private KieManagementService kieManagementService;
+
+    /**
+     * Procesa la petición GET al recurso "/management/deployedUnits", solicitando
+     * al servicio gestión del servidor Kie que imprima todas las unidades de despliegue disponibles.
+     * 
+     * @return "Texto"
+     */    
+    @GetMapping("/management/deployedUnits")
+    public String getDeployedUnits() {
+        // http://localhost:8090/management/deployedUnits
+        logger.info("IN --- /management/deployedUnits");
+
+        // Obtención de la lista de unidades de despliegue
+        kieManagementService.getDeployedUnits();
+
+        logger.info("OUT --- /management/deployedUnits");
+        return "Terminal Output";
+    }
+
+    /**
+     * Procesa la petición GET al recurso "/management/processInstances", solicitando
+     * al servicio de gestión del servidor Kie que imprima todas las instancias de 
+     * proceso existentes en la unidad de despliegue.
+     * 
+     * @param detailed Bandera que indica si se detallan o no las instancias de proceso
+     * @return "Texto"
+     */    
+    @GetMapping("/management/processInstances")
+    public String getProcessInstances(@RequestParam boolean detailed) {
+        // http://localhost:8090/management/processInstances?detailed=true
+        logger.info("IN --- /management/processInstances");
+
+        // Obtención de la lista de procesos
+        kieManagementService.getProcessInstances(detailed);
+
+        logger.info("OUT --- /management/processInstances");
+        return "Terminal Output";
+    }
+
+    /**
+     * Procesa la petición GET al recurso "/management/workItems", solicitando
+     * al servicio de gestión del servidor Kie que imprima todos los workItems de una
+     * instancia de proceso.
+     * 
+     * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
+     * @return "Texto"
+     */    
+    @GetMapping("/management/workItems")
+    public String getWorkItemsByProcessInstanceId(@RequestParam Long processInstanceId) {
+        
+        logger.info("IN --- /management/workItems");
+
+        // Obtención de la lista de WorkItems
+        kieManagementService.getWorkItemsByProcessInstanceId(processInstanceId);
+
+        logger.info("OUT --- /management/workItems");
+        return "Terminal Output";
+    }
+
+    /**
+     * Procesa la petición GET al recurso "/management/tasks", solicitando
+     * al servicio de gestión del servidor Kie que imprima todas las tareas de una
+     * instancia de proceso.
+     * 
+     * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
+     * @return "Texto"
+     */    
+    @GetMapping("/management/tasks")
+    public String getTasksByProcessInstanceId(@RequestParam Long processInstanceId) {
+        
+        logger.info("IN --- /management/tasks");
+
+        // Obtención de la lista de tareas
+        kieManagementService.getTasksByProcessInstanceId(processInstanceId);
+
+        logger.info("OUT --- /management/tasks");
+        return "Terminal Output";
+    }
+
+    /**
+     * Procesa la petición GET al recurso "/management/vars", solicitando
+     * al servicio de gestión del servidor Kie que imprima todas las variables de una
+     * instancia de proceso.
+     * 
+     * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
+     * @return "Texto"
+     */    
+    @GetMapping("/management/vars")
+    public String getVarssByProcessInstanceId(@RequestParam Long processInstanceId) {
+        
+        logger.info("IN --- /management/vars");
+
+        // Obtención de la lista de tareas
+        kieManagementService.getVarsByProcessInstanceId(processInstanceId);
+
+        logger.info("OUT --- /management/vars");
+        return "Terminal Output";
+    }
+
+}

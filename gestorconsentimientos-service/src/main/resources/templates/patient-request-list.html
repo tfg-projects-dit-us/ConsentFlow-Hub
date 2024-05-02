@@ -1,0 +1,35 @@
+<!-- Autor: Marco Antonio -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+    <head>
+        <meta charset="ISO-8859-1">
+        <title th:text="#{tasks.title}"></title>
+        <link rel="stylesheet" href="/form-styles.css">
+    </head>
+    <body>
+        <div th:include="components/navbar.html"></div>
+        <p th:text="#{tasks.head}">Here is your request list</p>
+        <table class="table" id="taskTable" style="margin-left: auto; margin-right: auto;">
+            <thead>
+                <tr>
+                    <th scope="row" th:text="#{tasks.name}">Name</th>
+                    <th scope="row" th:text="#{tasks.status}">Status</th>
+                    <th scope="row" th:text="#{tasks.id}">Id</th>
+                    <th scope="row" th:text="#{tasks.date}">Date</th>
+                    <th scope="row" th:text="#{tasks.creator}">Creator</th>
+                    <th scope="row" th:text="#{tasks.select}">Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="request : ${requestList}">
+                    <td th:text="${request.name}">Error</td>
+                    <td th:text="${request.status}">Error</td>
+                    <td th:text="${request.id}">Error</td>
+                    <td th:text="${request.createdOn}">Error</td>
+                    <td th:text="${request.createdBy}">Error</td>	
+                    <td><button class="button" th:data-url="@{/paciente/solicitud?{id}(id=${request.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{tasks.select}">Review</button></td> 		
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

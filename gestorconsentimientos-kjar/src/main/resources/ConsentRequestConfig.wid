@@ -1,0 +1,14 @@
+[
+  [
+    "name" : "ConsentRequestConfig", 
+    "parameters" : [ 
+        "processName" : new StringDataType()
+    ], 
+    "results" : [ 
+        "fhirServer" : new StringDataType(), 
+        "requestQuestionnaireId" : new StringDataType()  
+    ],
+    "displayName" : "ConsentRequestConfig", 
+    "icon" : "" 
+  ]
+]
