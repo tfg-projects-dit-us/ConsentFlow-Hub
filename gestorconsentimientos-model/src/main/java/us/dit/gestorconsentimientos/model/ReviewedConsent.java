@@ -10,25 +10,25 @@ package us.dit.gestorconsentimientos.model;
  */
 public class ReviewedConsent extends RequestedConsent {
 
-    public ReviewedConsent(String fhirServer, String requestQuestionnaireId, String requestQuestionnaireResponseId,
-            String practitioner, String patient, String reviewQuestionnaireId, String reviewQuestionnaireResponseId, Boolean review) {
+    public ReviewedConsent(String fhirServer, Long requestQuestionnaireId, Long requestQuestionnaireResponseId,
+            String practitioner, String patient, Long reviewQuestionnaireId, Long reviewQuestionnaireResponseId, Boolean review) {
         super(fhirServer, requestQuestionnaireId, requestQuestionnaireResponseId, practitioner, patient);
         this.review = review;
         this.reviewQuestionnaireId = reviewQuestionnaireId;
         this.reviewQuestionnaireResponseId = reviewQuestionnaireResponseId;
     }
 
-    protected final String reviewQuestionnaireId;
+    protected final Long reviewQuestionnaireId;
     
-    protected final String reviewQuestionnaireResponseId;
+    protected final Long reviewQuestionnaireResponseId;
 
     protected final Boolean review;
 
-    public String getReviewQuestionnaireId() {
+    public Long getReviewQuestionnaireId() {
         return reviewQuestionnaireId;
     }
 
-    public String getReviewQuestionnaireResponseId() {
+    public Long getReviewQuestionnaireResponseId() {
         return reviewQuestionnaireResponseId;
     }
 

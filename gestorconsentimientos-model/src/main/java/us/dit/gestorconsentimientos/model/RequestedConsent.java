@@ -11,15 +11,15 @@ public class RequestedConsent {
 
     protected final String fhirServer;
     
-    protected final String requestQuestionnaireId;
+    protected final Long requestQuestionnaireId;
     
-    protected final String requestQuestionnaireResponseId;
+    protected final Long requestQuestionnaireResponseId;
 
     protected final String practitioner;
 
     protected final String patient;
 
-    public RequestedConsent(String fhirServer, String requestQuestionnaireId, String requestQuestionnaireResponseId,
+    public RequestedConsent(String fhirServer, Long requestQuestionnaireId, Long requestQuestionnaireResponseId,
             String practitioner, String patient) {
         this.fhirServer = fhirServer;
         this.requestQuestionnaireId = requestQuestionnaireId;
@@ -32,11 +32,11 @@ public class RequestedConsent {
         return fhirServer;
     }
 
-    public String getRequestQuestionnaireId() {
+    public Long getRequestQuestionnaireId() {
         return requestQuestionnaireId;
     }
 
-    public String getRequestQuestionnaireResponseId() {
+    public Long getRequestQuestionnaireResponseId() {
         return requestQuestionnaireResponseId;
     }
 

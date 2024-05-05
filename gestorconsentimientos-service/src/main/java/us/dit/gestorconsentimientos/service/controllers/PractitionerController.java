@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Questionnaire;
-import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import us.dit.gestorconsentimientos.model.RequestedConsent;
 import us.dit.gestorconsentimientos.model.ReviewedConsent;
-import us.dit.gestorconsentimientos.service.services.fhir.FhirClient;
+import us.dit.gestorconsentimientos.service.model.FhirDAO;
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
 import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
 import us.dit.gestorconsentimientos.service.services.kie.process.ConsentRequestProcessService;
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
@@ -43,8 +43,7 @@ public class PractitionerController {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	@Autowired
-	private FhirClient fhir;
+    private static FhirDAO fhirDAO = new FhirDAO();
 
     @Autowired
     private ConsentRequestProcessService consentRequestProcess;
@@ -116,10 +115,10 @@ public class PractitionerController {
         UserDetails userDetails = null;
         Map<String,Object> params = new HashMap<String,Object>();
         Long processInstanceId = null;
-        Map<String,Object> vars = new HashMap<String,Object>();
+        Map<String,Object> vars = null;
         String fhirServer = null;
-        String requestQuestionnaireId = null;
-        Questionnaire requestQuestionnarie = null;
+        Long requestQuestionnaireId = null;
+        FhirDTO requestQuestionnarie = null;
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -135,18 +134,18 @@ public class PractitionerController {
         // Obtención del cuestionario a mostrar
         vars = consentRequestProcess.initRequestTask(processInstanceId);
         fhirServer = (String) vars.get("fhirServer");
-        requestQuestionnaireId = (String) vars.get("requestQuestionnaireId");
+        requestQuestionnaireId = (Long) vars.get("requestQuestionnaireId");
         logger.info("+ fhirServer: " + fhirServer);
         logger.info("+ requestQuestionnaireId: " + requestQuestionnaireId);
         httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("requestQuestionnaireId", requestQuestionnaireId);
-        requestQuestionnarie = fhir.getQuestionnaire(fhirServer, requestQuestionnaireId);
+        requestQuestionnarie = fhirDAO.get(fhirServer, "Questionnaire", requestQuestionnaireId);
         
         ///TODO plantilla Thymeleaf
 
         logger.info("OUT --- /facultativo/solicitar");
         //return "practitioner-request-questionnarie";
-        return questionnaireToFormPractitionerMapper.map(requestQuestionnarie);
+        return questionnaireToFormPractitionerMapper.map( (Questionnaire) requestQuestionnarie.getResource());
     }
 
 
@@ -171,20 +170,20 @@ public class PractitionerController {
 
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
-        Questionnaire requestQuestionnarie = fhir.getQuestionnaire(
-            fhirServer, (String) httpSession.getAttribute("requestQuestionnaireId"));
-        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse(requestQuestionnarie);
+        FhirDTO requestQuestionnarie = fhirDAO.get(
+            fhirServer, "Questionnaire",(Long) httpSession.getAttribute("requestQuestionnaireId"));
+        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( (Questionnaire) requestQuestionnarie.getResource());
         Map<String, String[]> formResponse = null; 
         List<String> patientList = null;
-        QuestionnaireResponse qestionnaireResponse = null;
-        String requestQuestionnarieResponseId = null;
+        FhirDTO qestionnaireResponse = null;
+        Long requestQuestionnarieResponseId = null;
         Map <String,Object> results = new HashMap<String,Object>();
         
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         formResponse = request.getParameterMap();
         patientList = Arrays.asList(formResponse.get("patients")[0].split(";"));
-        qestionnaireResponse = mapToQuestionnaireResponseMapper.map(deleteFielsPatients(formResponse));
-        requestQuestionnarieResponseId = fhir.saveQuestionnaireResponse(fhirServer, qestionnaireResponse);
+        qestionnaireResponse = new FhirDTO(fhirServer,mapToQuestionnaireResponseMapper.map(deleteFielsPatients(formResponse)));
+        requestQuestionnarieResponseId = fhirDAO.save(qestionnaireResponse);
         
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);

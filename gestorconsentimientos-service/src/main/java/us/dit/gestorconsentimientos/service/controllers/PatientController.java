@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import us.dit.gestorconsentimientos.service.services.fhir.FhirClient;
+import us.dit.gestorconsentimientos.service.model.FhirDAO;
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
 import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
 import us.dit.gestorconsentimientos.service.services.kie.process.ConsentReviewProcessService;
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
@@ -50,8 +51,7 @@ public class PatientController {
     @Autowired
     KieConsentService kieConsentService;
 
-    @Autowired
-    FhirClient fhirClient;
+    private static FhirDAO fhirDAO = new FhirDAO();
 
 	private final QuestionnaireResponseToQuestionnaire questionnaireResponseToQuestionnaire = new QuestionnaireResponseToQuestionnaire();
 	private final QuestionnaireToFormPatient questionnaireToFormPatient = new QuestionnaireToFormPatient();
@@ -137,27 +137,27 @@ public class PatientController {
         
         Map<String,Object> vars = null;
         String fhirServer = null;
-        String requestQuestionnaireResponseId = null;
-        QuestionnaireResponse requestQuestionnaireResponse = null;
-        Questionnaire reviewQuestionnaire = null;
-        String reviewQuestionnaireId = null;
+        Long requestQuestionnaireResponseId = null;
+        FhirDTO requestQuestionnaireResponse = null;
+        FhirDTO reviewQuestionnaire = null;
+        Long reviewQuestionnaireId = null;
         String reviewQuestionnarieForm = null;
 
         // Obtención de la solicitud de consentimiento creada por el facultativo
         vars = consentReviewProcessService.initReviewTask(id);
         fhirServer = (String) vars.get("fhirServer");
-        requestQuestionnaireResponseId = (String) vars.get("requestQuestionnaireResponseId");
-        requestQuestionnaireResponse = fhirClient.getQuestionnaireResponse(fhirServer, requestQuestionnaireResponseId);
+        requestQuestionnaireResponseId = (Long) vars.get("requestQuestionnaireResponseId");
+        requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
         // Generación del cuestionario que el paciente utiliza para revisar la solicitud de consentimiento
-        reviewQuestionnaire = questionnaireResponseToQuestionnaire.map(requestQuestionnaireResponse);
-        reviewQuestionnaireId = fhirClient.saveQuestionnaire(fhirServer,reviewQuestionnaire);
+        reviewQuestionnaire = new FhirDTO(fhirServer, questionnaireResponseToQuestionnaire.map( (QuestionnaireResponse) requestQuestionnaireResponse.getResource()));
+        reviewQuestionnaireId = fhirDAO.save(reviewQuestionnaire);
 
         httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("reviewQuestionnaireId", reviewQuestionnaireId);
         httpSession.setAttribute("processInstanceId", id);
 
-        reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
+        reviewQuestionnarieForm = questionnaireToFormPatient.map( (Questionnaire) reviewQuestionnaire.getResource());
 
         logger.info("OUT --- /paciente/solicitud");
         //TODO plantilla Thymeleaf
@@ -179,12 +179,12 @@ public class PatientController {
         logger.info("IN --- POST /paciente/solicitud");
 
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
-        String reviewQuestionnaireId = (String) httpSession.getAttribute("reviewQuestionnaireId");
+        Long reviewQuestionnaireId = (Long) httpSession.getAttribute("reviewQuestionnaireId");
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
         Map<String, String[]> reviewQuestionnaireFormResponse = null;
         MapToQuestionnaireResponse mapToQuestionnaireResponse = null;
-        QuestionnaireResponse reviewQuestionnaireResponse = null;
-        String reviewQuestionnaireResponseId = null;
+        FhirDTO reviewQuestionnaireResponse = null;
+        Long reviewQuestionnaireResponseId = null;
         Boolean review = null;
         Map<String, Object> results = new HashMap<String,Object>();
 
@@ -193,9 +193,9 @@ public class PatientController {
         
 		// Obtenemos los campos rellenados del Meta-Cuestionario en un Map
 		reviewQuestionnaireFormResponse = request.getParameterMap();
-        mapToQuestionnaireResponse = new MapToQuestionnaireResponse(fhirClient.getQuestionnaire(fhirServer, reviewQuestionnaireId));
-        reviewQuestionnaireResponse = mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse);
-        reviewQuestionnaireResponseId = fhirClient.saveQuestionnaireResponse(fhirServer, reviewQuestionnaireResponse);
+        mapToQuestionnaireResponse = new MapToQuestionnaireResponse( (Questionnaire) fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId).getResource());
+        reviewQuestionnaireResponse = new FhirDTO(fhirServer,mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse));
+        reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
         
         //TODO Obtener la respuesta del consentimiento... (Prodria no ser necesario cuando se utilice fhir Consent)
         //review = 

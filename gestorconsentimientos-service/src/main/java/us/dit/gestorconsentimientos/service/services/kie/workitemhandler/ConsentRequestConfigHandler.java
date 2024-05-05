@@ -27,7 +27,7 @@ public class ConsentRequestConfigHandler implements WorkItemHandler {
 	private String fhirServer;
 
 	@Value("${fhir.questionnaire.request.id}")
-	private String requestQuestionnaireId;
+	private Long requestQuestionnaireId;
 
 	@Override
 	public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {

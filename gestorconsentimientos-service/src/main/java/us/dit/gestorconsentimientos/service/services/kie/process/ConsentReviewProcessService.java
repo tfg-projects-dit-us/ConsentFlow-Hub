@@ -49,7 +49,7 @@ public class ConsentReviewProcessService {
     public Map <String, Object> initReviewTask(Long processInstanceId){
         
         String fhirServer = null;
-        String requestQuestionnaireResponseId = null;
+        Long requestQuestionnaireResponseId = null;
         Map <String, Object> vars = new HashMap<String,Object>();
         WorkItem workItemInstance = null;
         UserTaskInstanceDesc userTaskInstanceDesc = null;
@@ -57,7 +57,7 @@ public class ConsentReviewProcessService {
         //TODO ¿Sería más correcto obtener las variables de la tarea (Son variables de entrada), y no del proceso?
 
         fhirServer = (String) processService.getProcessInstanceVariable(processInstanceId, "fhirServer");
-        requestQuestionnaireResponseId = (String) processService.getProcessInstanceVariable(processInstanceId, "requestQuestionnaireResponseId");
+        requestQuestionnaireResponseId = (Long) processService.getProcessInstanceVariable(processInstanceId, "requestQuestionnaireResponseId");
         vars.put("fhirServer",fhirServer);
         vars.put("requestQuestionnaireResponseId",requestQuestionnaireResponseId);
 
