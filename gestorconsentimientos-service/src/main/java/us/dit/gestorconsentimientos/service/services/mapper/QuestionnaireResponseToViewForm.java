@@ -5,6 +5,8 @@ import java.util.List;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemAnswerOptionComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -16,24 +18,25 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
  * 
  * @author Jose Antonio
  */
-public class QuestionnaireResponseToViewForm implements IMapper<String, String> {
+@Service
+public class QuestionnaireResponseToViewForm{
 
 	
 	private FhirContext ctx = FhirContext.forR5();
-	private IGenericClient client = ctx.newRestfulGenericClient("http://hapi.fhir.org/baseR4");
-//	private IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/fhir/");
+
+	@Value("${fhirserver.location}")
+	private String fhirServer;
+
+	private IGenericClient client;
 	
 	private String patients;
 	
-	public QuestionnaireResponseToViewForm(String patients) {
-		super();
-		this.patients = patients;
-	}
-
-	@Override
-	public String map(String in) {
+	public String map(String questionnaireResponseId, String patients) {
 		// Obtenemos el QuestionnaireResponse a partir de su id
-		QuestionnaireResponse questionnaireResponse = client.read().resource(QuestionnaireResponse.class).withId(in).execute();
+		
+		this.patients = patients;
+		client = ctx.newRestfulGenericClient(fhirServer);
+		QuestionnaireResponse questionnaireResponse = client.read().resource(QuestionnaireResponse.class).withId(questionnaireResponseId).execute();
 		
 		String contentHtml = generateHtml(questionnaireResponse);
 		
@@ -110,7 +113,7 @@ public class QuestionnaireResponseToViewForm implements IMapper<String, String> 
 		case DATE:
 			question = createDateComponent(item, itemResponse);
 			break;
-		case CHOICE:
+		case CODING:
 			question = createChoiceComponent(item, itemResponse);
 			break;
 		case GROUP:
@@ -144,7 +147,7 @@ public class QuestionnaireResponseToViewForm implements IMapper<String, String> 
 			case DATE:
 				component = component + createDateComponent(item1, it1);
 				break;
-			case CHOICE:
+			case CODING:
 				component = component + createChoiceComponent(item1, it1);
 				break;
 			case GROUP:

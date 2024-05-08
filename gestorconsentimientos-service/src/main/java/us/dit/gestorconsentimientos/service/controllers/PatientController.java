@@ -53,8 +53,10 @@ public class PatientController {
 
     private static FhirDAO fhirDAO = new FhirDAO();
 
-	private final QuestionnaireResponseToQuestionnaire questionnaireResponseToQuestionnaire = new QuestionnaireResponseToQuestionnaire();
-	private final QuestionnaireToFormPatient questionnaireToFormPatient = new QuestionnaireToFormPatient();
+	@Autowired
+    QuestionnaireResponseToQuestionnaire questionnaireResponseToQuestionnaire;
+
+    private final QuestionnaireToFormPatient questionnaireToFormPatient = new QuestionnaireToFormPatient();
 
     /**
      * Controlador que gestiona las operaciones GET al recurso "/paciente".

@@ -88,7 +88,7 @@ public class QuestionnaireToFormPatient implements IMapper<Questionnaire, String
 		case DATE:
 			question = createDateComponent(item);
 			break;
-		case CHOICE:
+		case CODING:
 			question = createChoiceComponent(item);
 			break;
 		case GROUP:
@@ -117,7 +117,7 @@ public class QuestionnaireToFormPatient implements IMapper<Questionnaire, String
 			case DATE:
 				component = component + createDateComponent(it);
 				break;
-			case CHOICE:
+			case CODING:
 				component = component + createChoiceComponent(it);
 				break;
 			case GROUP:

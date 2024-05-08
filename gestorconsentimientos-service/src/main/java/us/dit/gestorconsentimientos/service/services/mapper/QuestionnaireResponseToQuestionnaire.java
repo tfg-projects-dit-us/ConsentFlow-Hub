@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r5.model.Enumerations.PublicationStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemType;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.StringType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
@@ -21,17 +25,26 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
  * 
  * @author Jose Antonio
  */
+@Service
 public class QuestionnaireResponseToQuestionnaire implements IMapper<QuestionnaireResponse, Questionnaire> {
 
+	private static final Logger logger = LogManager.getLogger();
+
 	private FhirContext ctx = FhirContext.forR5();
-	private IGenericClient client = ctx.newRestfulGenericClient("http://hapi.fhir.org/baseR4");
-//	private IGenericClient client = ctx.newRestfulGenericClient("http://localhost:8080/fhir/");
+
+	@Value("${fhirserver.location}")
+	private String fhirServer;
+
+	private IGenericClient client;
 
 	@Override
 	public Questionnaire map(QuestionnaireResponse in) {
 		Questionnaire questionnaire = null;
 		
+		logger.info(fhirServer);
+		this.client = ctx.newRestfulGenericClient(fhirServer);
 		String id = getQuestionnaire(in);
+
 		questionnaire = client.read().resource(Questionnaire.class).withId(id).execute();
 		
 		return questionnaire;
@@ -81,7 +94,7 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 						.setType(it.getType())
 						.addAnswerOption().setValue(item.getAnswer().get(0).getValue());
 					break;
-				case CHOICE:
+				case CODING:
 					questionnaire.addItem()
 						.setLinkId(item.getLinkId())
 						.setText(item.getText())
@@ -160,7 +173,7 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 							.addAnswerOption().setValue(item1.getAnswer().get(0).getValue());
 						example.add(t);
 						break;
-					case CHOICE:
+					case CODING:
 						t.setLinkId(item1.getLinkId())
 							.setText(item1.getText())
 							.setType(it1.getType())

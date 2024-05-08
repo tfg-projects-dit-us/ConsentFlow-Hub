@@ -97,7 +97,7 @@ public class QuestionnaireToFormPractitioner implements IMapper<Questionnaire, S
 		case DATE:
 			question = createDateComponent(item);
 			break;
-		case CHOICE:
+		case CODING:
 			question = createChoiceComponent(item);
 			break;
 		case GROUP:
@@ -123,7 +123,7 @@ public class QuestionnaireToFormPractitioner implements IMapper<Questionnaire, S
 			case DATE:
 				component = component + createDateComponent(it);
 				break;
-			case CHOICE:
+			case CODING:
 				component = component + createChoiceComponent(it);
 				break;
 			case GROUP:
@@ -354,7 +354,7 @@ public class QuestionnaireToFormPractitioner implements IMapper<Questionnaire, S
 							.setValue(new StringType(getParameter(values)));
 					example.add(t);
 					break;
-				case CHOICE:
+				case CODING:
 					t.setLinkId(it.getLinkId()).setText(it.getText()).addAnswer()
 							.setValue(new StringType(getParameter(values)));
 					example.add(t);
