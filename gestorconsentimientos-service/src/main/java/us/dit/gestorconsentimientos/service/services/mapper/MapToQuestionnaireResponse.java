@@ -11,6 +11,9 @@ import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseStatus;
+
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
+
 import org.hl7.fhir.r5.model.StringType;
 
 
@@ -20,16 +23,16 @@ import org.hl7.fhir.r5.model.StringType;
  * 
  * @author Jose Antonio
  */
-public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>, QuestionnaireResponse> {
+public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>, FhirDTO> {
 
 	private Questionnaire questionnaire;
 
-	public MapToQuestionnaireResponse(Questionnaire questionnaire) {
-		this.questionnaire = questionnaire;
+	public MapToQuestionnaireResponse(FhirDTO questionnaire) {
+		this.questionnaire =  (Questionnaire) questionnaire.getResource();
 	}
 
 	@Override
-	public QuestionnaireResponse map(Map<String, String[]> in) {
+	public FhirDTO map(Map<String, String[]> in) {
 		QuestionnaireResponse response = new QuestionnaireResponse();
 
 		// Simplificar Map, borrar los campos opcionales que no se hayan rellenado
@@ -56,7 +59,7 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 			}
 		}
 
-		return response;
+		return new FhirDTO(response);
 	}
 
 	private void responseGroup(QuestionnaireResponse response, QuestionnaireItemComponent item,

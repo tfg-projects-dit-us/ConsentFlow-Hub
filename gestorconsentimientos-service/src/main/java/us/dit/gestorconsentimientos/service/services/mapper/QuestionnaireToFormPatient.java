@@ -5,6 +5,8 @@ import java.util.List;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemAnswerOptionComponent;
 
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
+
 /**
  * Mapper que permite la generación del contenido HTML para mostrar un formulario a 
  * partir de un recurso Fhir de tipo Questionnaire, para que un paciente acepte o 
@@ -12,11 +14,11 @@ import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemAnswerOptionComponen
  * 
  * @author Jose Antonio
  */
-public class QuestionnaireToFormPatient implements IMapper<Questionnaire, String> {
+public class QuestionnaireToFormPatient implements IMapper<FhirDTO, String> {
 
 	@Override
-	public String map(Questionnaire in) {
-		String contentHtml = generateHtml(in);
+	public String map(FhirDTO in) {
+		String contentHtml = generateHtml( (Questionnaire) in.getResource());
 		
 		return contentHtml;
 	}

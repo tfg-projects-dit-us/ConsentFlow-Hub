@@ -17,6 +17,8 @@ import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 import org.springframework.stereotype.Service;
 
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
+
 
 /**
  * Mapper que permite la generación del contenido HTML para mostrar un formulario a 
@@ -26,11 +28,12 @@ import org.springframework.stereotype.Service;
  * @author Jose Antonio
  */
 @Service
-public class QuestionnaireToFormPractitioner implements IMapper<Questionnaire, String> {
+public class QuestionnaireToFormPractitioner implements IMapper<FhirDTO, String> {
 	private static final Logger logger = LogManager.getLogger();
+	
 	@Override
-	public String map(Questionnaire in) {
-		String contentHtml = generateHtml(in);
+	public String map(FhirDTO in) {
+		String contentHtml = generateHtml( (Questionnaire) in.getResource());
 		return contentHtml;
 	}
 	

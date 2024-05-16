@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hl7.fhir.r5.model.Questionnaire;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -145,7 +145,7 @@ public class PractitionerController {
 
         logger.info("OUT --- /facultativo/solicitar");
         //return "practitioner-request-questionnarie";
-        return questionnaireToFormPractitionerMapper.map( (Questionnaire) requestQuestionnarie.getResource());
+        return questionnaireToFormPractitionerMapper.map(requestQuestionnarie);
     }
 
 
@@ -172,7 +172,7 @@ public class PractitionerController {
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
         FhirDTO requestQuestionnarie = fhirDAO.get(
             fhirServer, "Questionnaire",(Long) httpSession.getAttribute("requestQuestionnaireId"));
-        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( (Questionnaire) requestQuestionnarie.getResource());
+        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( requestQuestionnarie);
         Map<String, String[]> formResponse = null; 
         List<String> patientList = null;
         FhirDTO qestionnaireResponse = null;
@@ -182,9 +182,10 @@ public class PractitionerController {
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         formResponse = request.getParameterMap();
         patientList = Arrays.asList(formResponse.get("patients")[0].split(";"));
-        qestionnaireResponse = new FhirDTO(fhirServer,mapToQuestionnaireResponseMapper.map(deleteFielsPatients(formResponse)));
+        qestionnaireResponse = mapToQuestionnaireResponseMapper.map(deleteFielsPatients(formResponse));
+        qestionnaireResponse.setServer(fhirServer);
         requestQuestionnarieResponseId = fhirDAO.save(qestionnaireResponse);
-        
+
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
         results.put("patientList",patientList);

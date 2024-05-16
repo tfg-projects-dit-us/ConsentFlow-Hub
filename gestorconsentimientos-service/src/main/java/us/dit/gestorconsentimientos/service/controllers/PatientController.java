@@ -9,8 +9,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hl7.fhir.r5.model.Questionnaire;
-import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -152,14 +150,15 @@ public class PatientController {
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
         // Generación del cuestionario que el paciente utiliza para revisar la solicitud de consentimiento
-        reviewQuestionnaire = new FhirDTO(fhirServer, questionnaireResponseToQuestionnaire.map( (QuestionnaireResponse) requestQuestionnaireResponse.getResource()));
+        reviewQuestionnaire = questionnaireResponseToQuestionnaire.map( requestQuestionnaireResponse);
+        reviewQuestionnaire.setServer(fhirServer);
         reviewQuestionnaireId = fhirDAO.save(reviewQuestionnaire);
 
         httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("reviewQuestionnaireId", reviewQuestionnaireId);
         httpSession.setAttribute("processInstanceId", id);
 
-        reviewQuestionnarieForm = questionnaireToFormPatient.map( (Questionnaire) reviewQuestionnaire.getResource());
+        reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
 
         logger.info("OUT --- /paciente/solicitud");
         //TODO plantilla Thymeleaf
@@ -195,8 +194,9 @@ public class PatientController {
         
 		// Obtenemos los campos rellenados del Meta-Cuestionario en un Map
 		reviewQuestionnaireFormResponse = request.getParameterMap();
-        mapToQuestionnaireResponse = new MapToQuestionnaireResponse( (Questionnaire) fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId).getResource());
-        reviewQuestionnaireResponse = new FhirDTO(fhirServer,mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse));
+        mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId));
+        reviewQuestionnaireResponse = mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse);
+        reviewQuestionnaireResponse.setServer(fhirServer);
         reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
         
         //TODO Obtener la respuesta del consentimiento... (Prodria no ser necesario cuando se utilice fhir Consent)

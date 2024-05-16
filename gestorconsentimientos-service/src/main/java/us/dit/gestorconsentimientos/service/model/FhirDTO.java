@@ -17,6 +17,10 @@ public class FhirDTO {
         this.server = server;
     }
 
+    public void setServer(String server) {
+        this.server = server;
+    }
+
     public IBaseResource getResource(){
         return resource;
     }
@@ -24,6 +28,5 @@ public class FhirDTO {
     public String getServer() {
         return server;
     }
-
     
 }

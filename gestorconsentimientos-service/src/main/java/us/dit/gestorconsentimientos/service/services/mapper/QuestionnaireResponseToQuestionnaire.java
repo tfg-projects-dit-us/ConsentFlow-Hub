@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.api.MethodOutcome;
+
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
 
 
 /**
@@ -26,7 +27,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
  * @author Jose Antonio
  */
 @Service
-public class QuestionnaireResponseToQuestionnaire implements IMapper<QuestionnaireResponse, Questionnaire> {
+public class QuestionnaireResponseToQuestionnaire implements IMapper<FhirDTO, FhirDTO> {
 
 	private static final Logger logger = LogManager.getLogger();
 
@@ -38,20 +39,18 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 	private IGenericClient client;
 
 	@Override
-	public Questionnaire map(QuestionnaireResponse in) {
+	public FhirDTO map(FhirDTO in) {
 		Questionnaire questionnaire = null;
 		
 		logger.info(fhirServer);
 		this.client = ctx.newRestfulGenericClient(fhirServer);
-		String id = getQuestionnaire(in);
-
-		questionnaire = client.read().resource(Questionnaire.class).withId(id).execute();
+		questionnaire = getQuestionnaire( (QuestionnaireResponse) in.getResource());
 		
-		return questionnaire;
+		return new FhirDTO(questionnaire);
 	}
 	
-	private String getQuestionnaire(QuestionnaireResponse response) {
-		String id = null;
+	private Questionnaire getQuestionnaire(QuestionnaireResponse response) {
+		
 		Questionnaire questionnaire = new Questionnaire();
 		Questionnaire metaQuestionnaire = client.read().resource(Questionnaire.class).withUrl(response.getQuestionnaire()).execute();
 		
@@ -123,18 +122,8 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<Questionnai
 			.setType(QuestionnaireItemType.BOOLEAN)
 			.setRequired(true);
 		
-		id = createQuest(questionnaire);
 		
-		return id;
-	}
-	
-	private String createQuest(Questionnaire questionnaire) {
-		String id = null;
-		
-		MethodOutcome outcome = client.create().resource(questionnaire).execute();
-		id = outcome.getId().getIdPart();
-		
-		return id;
+		return questionnaire;
 	}
 	
 	private void addGroup(Questionnaire questionnaire, QuestionnaireResponse.QuestionnaireResponseItemComponent item, Questionnaire.QuestionnaireItemComponent it) {

@@ -60,8 +60,8 @@ El proceso cuenta con las siguientes variables:
 | --------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | String    | practitioner                   | usuario facultativo                                                                                                                                     |
 | String    | fhirServer                     | servidor fhir del que obtener el recurso Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento         |
-| String    | requestQuestionnaireId         | id del recurso fhir de tipo Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento                      |
-| String    | requestQuestionnaireResponseId | id del recurso fhir de tipo QuestionnarieResponse que representa la respuesta al cuestionario que asiste la creación de la solicitud del consentimiento |
+| Long    | requestQuestionnaireId         | id del recurso fhir de tipo Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento                      |
+| Long    | requestQuestionnaireResponseId | id del recurso fhir de tipo QuestionnarieResponse que representa la respuesta al cuestionario que asiste la creación de la solicitud del consentimiento |
 | ArrayList | patientList                    | lista de pacientes a los que va dirigida la solicitud de consentimiento                                                                                 |
 | ArrayList | reviewList                     | lista de respuestas de los pacientes a su solicitud de consentimiento                                                                                   |
 
@@ -195,11 +195,11 @@ El proceso tiene las siguientes variables:
 | ------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | String  | practitioner                   | usuario facultativo                                                                                                                                                           |
 | String  | fhirServer                     | servidor fhir del que obtener el recurso Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento                               |
-| String  | requestQuestionnaireId         | id del recurso fhir de tipo Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento                                            |
-| String  | requestQuestionnaireResponseId | id del recurso fhir de tipo Questionnarie Response que representa la respuesta al cuestionario que asiste la creación de la solicitud del consentimiento                      |
+| Long  | requestQuestionnaireId         | id del recurso fhir de tipo Questionnaire que representa el cuestionario que asiste la creación de la solicitud del consentimiento                                            |
+| Long  | requestQuestionnaireResponseId | id del recurso fhir de tipo Questionnarie Response que representa la respuesta al cuestionario que asiste la creación de la solicitud del consentimiento                      |
 | String  | patient                        | paciente que tiene que contestar a la solicitud de consentimiento                                                                                                             |
-| String  | reviewQuestionnaireId          | id del recurso fhir de tipo Questionnarie que respresenta el cuestionario mostrado al paciente para que este acepte o rechace la solicitud de consentimiento                  |
-| String  | reviewQuestionnaireResponseId  | id del recurso fhir de tipo Questionnarie Respose que representa la respuesta del paciente al cuestionario en el que acepta o rechaza la solicitud de consentimiento recibida |
+| Long  | reviewQuestionnaireId          | id del recurso fhir de tipo Questionnarie que respresenta el cuestionario mostrado al paciente para que este acepte o rechace la solicitud de consentimiento                  |
+| Long  | reviewQuestionnaireResponseId  | id del recurso fhir de tipo Questionnarie Respose que representa la respuesta del paciente al cuestionario en el que acepta o rechaza la solicitud de consentimiento recibida |
 | Boolean | review                         | respuesta del paciente a la solicitud de consentimiento                                                                                                                       |
 
 #### Nodos del workflow del proceso
@@ -291,6 +291,37 @@ Para que la aplicación generada funcione correctamente, es necesario modificar 
     <!-- Versiones 2.7.0, 2.7.15 y 2.7.16 dan un error al persistir-->
 </parent>
 ```
+
+Cómo se va a trabajar con Hapi Fhir, se van a definir e incluir las dependencias necesarias al proyecto, las cuales van a trabajar en la versión" 6.4.0", la versión más actual a la que no existen problemas de compatibilidad, puesto que el procesamiento XML de FHIR utilizará la implementación StAX "Woodstox" versión "6.4.0", e utilizar versiones superiores para estas dependencias genera un fallo al trabajar con ellos.
+```xml
+<!-- Hapi Fhir -->
+<dependency>
+  <groupId>ca.uhn.hapi.fhir</groupId>
+  <artifactId>hapi-fhir-structures-r5</artifactId>
+  <version>${hapifhir.version}</version>
+</dependency>
+<dependency>
+  <groupId>ca.uhn.hapi.fhir</groupId>
+  <artifactId>hapi-fhir-base</artifactId>
+  <version>${hapifhir.version}</version>
+</dependency>
+<dependency>
+  <groupId>ca.uhn.hapi.fhir</groupId>
+  <artifactId>hapi-fhir-client</artifactId>
+  <version>${hapifhir.version}</version>
+</dependency>
+```
+
+Otra dependencia que es necesaria para poder trabajar con las plantillas thymeleaf:
+```xml
+<!-- HTML Templates -->
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+
+Para poder trabajar con los activos de negocio que va a contener el proyecto "kjar", desde business-central (jbpm), es necesario crear un repositorio de control de versiones git, el cual va a permitir llevar a cabo modificaciones en el proyecto desde la herramienta.
 
 Para que el contenido del proyecto gestorconsentimientos-model esté disponible tanto para el proyecto kjar como para el proyecto service, es necesario incluirlo en sus dependencias, lo cual se realiza en los ficheros pom.xml correspondientes a cada proyecto.
 
