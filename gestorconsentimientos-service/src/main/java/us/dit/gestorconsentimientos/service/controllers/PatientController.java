@@ -110,7 +110,7 @@ public class PatientController {
             logger.info(requestConsent.toString());  
         }
 
-        //TODO plantilla Thymeleaf
+        model.addAttribute("requestConsentList", requestConsentList);
 
         logger.info("OUT --- /paciente/solicitudes");
         return "patient-request-list";
@@ -241,8 +241,7 @@ public class PatientController {
             logger.info(ReviewedConsent.toString());  
         }
 
-        //TODO plantilla Thymeleaf
-
+        model.addAttribute("consentList", consentList);
 
         logger.info("OUT --- /paciente/consentimientos");
         return "patient-consent-list";

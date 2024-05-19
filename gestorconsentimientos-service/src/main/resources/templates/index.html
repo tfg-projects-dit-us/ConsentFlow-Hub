@@ -2,11 +2,14 @@
 <!-- Autor: Javier -->
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
-        <title>Gestor de Consentimientos</title>
+        <title th:text="#{application.title}"></title>
+        <meta charset="ISO-8859-1">
+        <link rel="stylesheet" href="/form-styles.css">
     </head>
     <body>
-        <h1>Gestor de Consentimientos</h1>
-
-        <p>Pulsa <a th:href="@{/menu}">aquí</a> para acceder a la aplicación.</p>
+        <h1 th:text="#{application.title}"></h1>
+        <p>Bienvenido al gestor de consentimientos, accede a la aplicación.<p>
+        <button onclick="location.href = '/menu';">Español</button>
+        <button onclick="location.href = 'menu?lang=en';">English</button>
     </body>
 </html>

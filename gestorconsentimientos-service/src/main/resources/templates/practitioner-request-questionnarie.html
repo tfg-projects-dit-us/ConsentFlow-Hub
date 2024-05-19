@@ -3,8 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
         <title>Gestor de Consentimientos</title>
+        <meta charset="ISO-8859-1">
+        <link rel="stylesheet" href="/form-styles.css">        
     </head>
     <body>
+        <div th:include="components/navbar.html"></div>
         <h1>Cuestionario para la creación de una solicitud de consentimiento</h1>
+        <div th:include="components/questionnaire-form.html"></div>
     </body>
 </html>

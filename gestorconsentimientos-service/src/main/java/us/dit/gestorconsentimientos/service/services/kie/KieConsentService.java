@@ -1,6 +1,7 @@
 package us.dit.gestorconsentimientos.service.services.kie;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -86,9 +87,11 @@ public class KieConsentService {
             processInstanceVars = processInstanceDesc.getVariables();            
             
             consentsList.add(new RequestedConsent(
+                (Long) processInstanceDesc.getId(),
                 (String) processInstanceVars.get("fhirServer"),
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Date) processInstanceDesc.getDataTimeStamp(),
                 (String) processInstanceVars.get("practitioner"), 
                 (String) processInstanceVars.get("patient")));
         }
@@ -128,9 +131,11 @@ public class KieConsentService {
             processInstanceVars = processInstanceDesc.getVariables();            
             
             consentsList.add(new ReviewedConsent(
+                (Long) processInstanceDesc.getId(),
                 (String) processInstanceVars.get("fhirServer"),
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")),
+                (Date) processInstanceDesc.getDataTimeStamp(),
                 (String) processInstanceVars.get("practitioner"), 
                 (String) processInstanceVars.get("patient"), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
@@ -199,9 +204,11 @@ public class KieConsentService {
             processInstanceVars = processInstanceDesc.getVariables();            
             
             consentsList.add(new RequestedConsent(
+                (Long) processInstanceDesc.getId(),
                 (String) processInstanceVars.get("fhirServer"),
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")),
+                (Date) processInstanceDesc.getDataTimeStamp(),
                 (String) processInstanceVars.get("practitioner"), 
                 (String) processInstanceVars.get("patient")));
         }
@@ -261,9 +268,11 @@ public class KieConsentService {
             processInstanceVars = processInstanceDesc.getVariables();            
             
             consentsList.add(new ReviewedConsent(
+                (Long) processInstanceDesc.getId(),
                 (String) processInstanceVars.get("fhirServer"),
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Date) processInstanceDesc.getDataTimeStamp(),
                 (String) processInstanceVars.get("practitioner"), 
                 (String) processInstanceVars.get("patient"), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 

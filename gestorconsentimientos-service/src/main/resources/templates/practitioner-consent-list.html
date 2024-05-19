@@ -2,9 +2,40 @@
 <!-- Autor: Javier -->
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
-        <title>Gestor de Consentimientos</title>
+        <title th:text="#{application.title}"></title>
+        <meta charset="ISO-8859-1">
+        <link rel="stylesheet" href="/form-styles.css">        
     </head>
     <body>
-        <h1>Lista de consentimientos para el facultativo</h1>
+        <div th:include="components/navbar.html"></div>
+        <h1 th:text="#{practitioner.list.consent.title}"></h1>
+        <table class="table" id="taskTable" style="margin-left: auto; margin-right: auto;">
+            <thead>
+                <tr>
+                    <th scope="row" th:text="#{table.head.id}"></th>
+                    <th scope="row" th:text="#{table.head.date}"></th>
+                    <th scope="row" th:text="#{table.head.practitioner}"></th>
+                    <th scope="row" th:text="#{table.head.patient}"></th>
+                    <th scope="row" th:text="#{table.head.requestQuestionnaireId}"></th>
+                    <th scope="row" th:text="#{table.head.requestQuestionnaireResponseId}"></th>
+                    <th scope="row" th:text="#{table.head.reviewQuestionnaireId}"></th>
+                    <th scope="row" th:text="#{table.head.reviewQuestionnaireResponseId}"></th>                    
+                    <th scope="row" th:text="#{table.head.action}"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="consent : ${consentList}">
+                    <td th:text="${consent.getId()}">Error</td>
+                    <td th:text="${consent.getDate()}">Error</td>
+                    <td th:text="${consent.getPractitioner()}">Error</td>
+                    <td th:text="${consent.getPatient()}">Error</td>
+                    <td th:text="${consent.getRequestQuestionnaireId()}">Error</td>
+                    <td th:text="${consent.getRequestQuestionnaireResponseId()}">Error</td>
+                    <td th:text="${consent.getReviewQuestionnaireId()}">Error</td>
+                    <td th:text="${consent.getReviewQuestionnaireResponseId()}">Error</td>                    
+                    <td><button class="button" th:data-url="@{/paciente/solicitud?id={id}(id=${consent.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>

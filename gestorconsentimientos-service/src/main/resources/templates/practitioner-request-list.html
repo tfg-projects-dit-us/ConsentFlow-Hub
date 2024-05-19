@@ -3,8 +3,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
         <title>Gestor de Consentimientos</title>
+        <meta charset="ISO-8859-1">
+        <link rel="stylesheet" href="/form-styles.css">        
     </head>
     <body>
-        <h1>Lista de solicitudes de consentimiento del facultativo</h1>
+        <div th:include="components/navbar.html"></div>
+        <h1 th:text="#{practitioner.list.request.title}"></h1>
+        <table class="table" id="taskTable" style="margin-left: auto; margin-right: auto;">
+            <thead>
+                <tr>
+                    <th scope="row" th:text="#{table.head.id}"></th>
+                    <th scope="row" th:text="#{table.head.date}"></th>
+                    <th scope="row" th:text="#{table.head.practitioner}"></th>
+                    <th scope="row" th:text="#{table.head.patient}"></th>
+                    <th scope="row" th:text="#{table.head.requestQuestionnaireId}"></th>
+                    <th scope="row" th:text="#{table.head.requestQuestionnaireResponseId}"></th>
+                    <th scope="row" th:text="#{table.head.action}"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="requestConsent : ${requestConsentList}">
+                    <td th:text="${requestConsent.getId()}">Error</td>
+                    <td th:text="${requestConsent.getDate()}">Error</td>
+                    <td th:text="${requestConsent.getPractitioner()}">Error</td>
+                    <td th:text="${requestConsent.getPatient()}">Error</td>
+                    <td th:text="${requestConsent.getRequestQuestionnaireId()}">Error</td>
+                    <td th:text="${requestConsent.getRequestQuestionnaireResponseId()}">Error</td>	
+                    <td><button class="button" th:data-url="@{/paciente/solicitud?id={id}(id=${requestConsent.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>

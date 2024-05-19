@@ -1,5 +1,6 @@
 package us.dit.gestorconsentimientos.model;
 
+import java.util.Date;
 
 /**
  * Clase que representa un consentimiento (una solicitud de consentimiento revisado por 
@@ -10,9 +11,9 @@ package us.dit.gestorconsentimientos.model;
  */
 public class ReviewedConsent extends RequestedConsent {
 
-    public ReviewedConsent(String fhirServer, Long requestQuestionnaireId, Long requestQuestionnaireResponseId,
+    public ReviewedConsent(Long id, String fhirServer, Long requestQuestionnaireId, Long requestQuestionnaireResponseId, Date date,
             String practitioner, String patient, Long reviewQuestionnaireId, Long reviewQuestionnaireResponseId, Boolean review) {
-        super(fhirServer, requestQuestionnaireId, requestQuestionnaireResponseId, practitioner, patient);
+        super(id, fhirServer, requestQuestionnaireId, requestQuestionnaireResponseId, date, practitioner, patient);
         this.review = review;
         this.reviewQuestionnaireId = reviewQuestionnaireId;
         this.reviewQuestionnaireResponseId = reviewQuestionnaireResponseId;

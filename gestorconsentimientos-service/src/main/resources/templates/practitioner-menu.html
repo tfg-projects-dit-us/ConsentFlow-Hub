@@ -2,12 +2,16 @@
 <!-- Autor: Javier -->
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
-        <title>Gestor de Consentimientos</title>
+        <title th:text="#{application.title}"></title>
+        <meta charset="ISO-8859-1">
+        <link rel="stylesheet" href="/form-styles.css">
     </head>
     <body>
-        <h1>Menu del facultativo</h1>
-
-        <p>Pulsa <a th:href="@{/facultativo/solicitar}">aquí</a> para solicitar un consentimiento.</p>
-
+        <div th:include="components/navbar.html"></div>
+        <h1 th:text="#{practitioner.menu.title}"></h1>
+        <p>Bienvenido al menu, como facultativo puedes solicitar nuevos consentimientos, consultar los solicitados, y consultar los obtenidos.<p>
+        <button onclick="location.href = '/facultativo/solicitar';" th:text="#{practitioner.menu.claim}"></button>
+        <button onclick="location.href = '/facultativo/solicitudes';" th:text="#{practitioner.menu.query.claims}"></button>
+        <button onclick="location.href = '/facultativo/consentimientos';" th:text="#{practitioner.menu.query.consents}"></button>
     </body>
 </html>

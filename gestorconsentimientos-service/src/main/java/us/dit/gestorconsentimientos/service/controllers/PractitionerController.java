@@ -54,6 +54,7 @@ public class PractitionerController {
 	@Autowired
 	private QuestionnaireToFormPractitioner questionnaireToFormPractitionerMapper;
 
+
 	private Map<String, String[]> deleteFielsPatients(Map<String, String[]> response){
 		Map<String, String[]> result = new HashMap<String, String[]>();
 		
@@ -213,7 +214,7 @@ public class PractitionerController {
         
         Authentication auth = null;
         UserDetails userDetails = null;
-        List<RequestedConsent> requestedConsentsList = null;
+        List<RequestedConsent> requestConsentList = null;
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -221,13 +222,13 @@ public class PractitionerController {
         logger.info("+ practitioner: " + userDetails.getUsername());
 
         // Obtención de la lista de solicitudes de consentimiento emitidas por el facultativo
-        requestedConsentsList = kieConsentService.getRequestedConsentsByPractitioner(userDetails.getUsername());
+        requestConsentList = kieConsentService.getRequestedConsentsByPractitioner(userDetails.getUsername());
         logger.info("Lista de solicitudes de consentimientos emitidas por el facultativo: ");
-        for (RequestedConsent reviewedConsent: requestedConsentsList){
+        for (RequestedConsent reviewedConsent: requestConsentList){
             logger.info(reviewedConsent.toString());    
         }
 
-        //TODO plantilla Thymeleaf
+        model.addAttribute("requestConsentList", requestConsentList);
         
         logger.info("OUT --- /facultativo/solicitudes");
         return "practitioner-request-list";
@@ -269,7 +270,7 @@ public class PractitionerController {
 
         Authentication auth = null;
         UserDetails userDetails = null;
-        List<ReviewedConsent> consentsList = null;
+        List<ReviewedConsent> consentList = null;
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -277,13 +278,13 @@ public class PractitionerController {
         logger.info("+ practitioner: " + userDetails.getUsername());
 
         // Obtención de la lista de consentimientos obtenidos por el facultativo
-        consentsList = kieConsentService.getConsentsByPractitioner(userDetails.getUsername());
+        consentList = kieConsentService.getConsentsByPractitioner(userDetails.getUsername());
         logger.info("Lista de consentimientos obtenidos por el facultativo: ");
-        for (ReviewedConsent reviewedConsent: consentsList){
+        for (ReviewedConsent reviewedConsent: consentList){
             logger.info(reviewedConsent.toString());
         }
 
-        //TODO plantilla Thymeleaf
+        model.addAttribute("consentList", consentList);
        
         logger.info("OUT --- /facultativo/consentimientos");
         return "practitioner-consent-list";
