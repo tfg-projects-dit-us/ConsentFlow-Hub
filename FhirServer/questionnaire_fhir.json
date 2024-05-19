@@ -1,0 +1,347 @@
+{
+  "resourceType": "Questionnaire",
+  "title": "Meta-Questionnaire",
+  "status": "active",
+  "item": [ {
+    "linkId": "1",
+    "text": "Mandatory fields",
+    "type": "group",
+    "item": [ {
+      "linkId": "patients",
+      "text": "Who do we ask for consent?",
+      "type": "string",
+      "required": true
+    }, {
+      "linkId": "1.2",
+      "text": "What are we asking for?",
+      "type": "coding",
+      "required": true,
+      "answerOption": [ {
+        "valueCoding": {
+          "code": "HPAYMT",
+          "display": "Healthcare Payment"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HMARKT",
+          "display": "Healthcare Marketing"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HCOMPL",
+          "display": "Health Compliance"
+        }
+      }, {
+        "valueCoding": {
+          "code": "TRAIN",
+          "display": "Training"
+        }
+      }, {
+        "valueCoding": {
+          "code": "GOV",
+          "display": "Government"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HDM",
+          "display": "Healthcare Delivery Management"
+        }
+      }, {
+        "valueCoding": {
+          "code": "ETREAT",
+          "display": "Emergency Treatment"
+        }
+      }, {
+        "valueCoding": {
+          "code": "PATADMIN",
+          "display": "Patient Administration"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HOUTCOMS",
+          "display": "Health Outcome Measure"
+        }
+      }, {
+        "valueCoding": {
+          "code": "ENROLLM",
+          "display": "Enrollment"
+        }
+      }, {
+        "valueCoding": {
+          "code": "PUBHLTH",
+          "display": "Public Health"
+        }
+      }, {
+        "valueCoding": {
+          "code": "CAREMGT",
+          "display": "Care Management"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HRESCH",
+          "display": "Healthcare Research"
+        }
+      }, {
+        "valueCoding": {
+          "code": "TREAT",
+          "display": "Treatment"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HLEGAL",
+          "display": "Legal"
+        }
+      }, {
+        "valueCoding": {
+          "code": "CLINTRCH",
+          "display": "Clinical Trial Research"
+        }
+      }, {
+        "valueCoding": {
+          "code": "HOPERAT",
+          "display": "Healthcare Operations"
+        }
+      } ]
+    }, {
+      "linkId": "1.3",
+      "text": "For how long is it requested?",
+      "type": "date",
+      "required": true
+    }, {
+      "linkId": "1.4",
+      "text": "Who is it for?",
+      "type": "string",
+      "required": true
+    }, {
+      "linkId": "1.5",
+      "text": "What is to be done with this information?",
+      "type": "coding",
+      "required": true,
+      "answerOption": [ {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/valueset-consent-action.html",
+          "code": "collect",
+          "display": "Collect"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/valueset-consent-action.html",
+          "code": "access",
+          "display": "Access"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/valueset-consent-action.html",
+          "code": "use",
+          "display": "Use"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/valueset-consent-action.html",
+          "code": "disclose",
+          "display": "Disclose"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/valueset-consent-action.html",
+          "code": "correct",
+          "display": "Correct"
+        }
+      } ]
+    } ]
+  }, {
+    "linkId": "2",
+    "text": "Optional fields",
+    "type": "group",
+    "item": [ {
+      "linkId": "2.1",
+      "text": "Time period of information?",
+      "type": "date",
+      "required": false
+    }, {
+      "linkId": "2.2",
+      "text": "Type of information?",
+      "type": "string",
+      "required": false
+    }, {
+      "linkId": "2.3",
+      "text": "Type of FHIR resource requested?",
+      "type": "coding",
+      "required": false,
+      "answerOption": [ {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "AllergyIntolerance",
+          "display": "Allergy Intolerance"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "Condition",
+          "display": "Condition"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "Procedure",
+          "display": "Procedure"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "FamilyMemberHistory",
+          "display": "Family Member History"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "CarePlan",
+          "display": "Care Plan"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "Goal",
+          "display": "Goal"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "CareTeam",
+          "display": "Care Team"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "ClinicalImpression",
+          "display": "Clinical Impression"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "AdverseEvent",
+          "display": "Adverse Event"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "DetectedIssue",
+          "display": "Detected Issue"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/clinicalsummary-module.html",
+          "code": "RiskAssessment",
+          "display": "Risk Assessment"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "Observation",
+          "display": "Observation"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "DiagnosticReport",
+          "display": "Diagnostic Report"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "ServiceRequest",
+          "display": "Service Request"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "Media",
+          "display": "Media"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "ImagingStudy",
+          "display": "Imaging Study"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "MolecularSequence",
+          "display": "Molecular Sequence"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "Specimen",
+          "display": "Specimen"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/diagnostics-module.html",
+          "code": "BodyStructure",
+          "display": "Body Structure"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "MedicationResquest",
+          "display": "Medication Resquest"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "MedicationDispense",
+          "display": "Medication Dispense"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "MedicationAdministration",
+          "display": "Medication Administration"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "MedicationStatement",
+          "display": "Medication Statement"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "Medication",
+          "display": "Medication"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "MedicationKnowledge",
+          "display": "Medication Knowledge"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "Immunization",
+          "display": "Immunization"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "ImmunizationEvaliation",
+          "display": "Immunization Evaliation"
+        }
+      }, {
+        "valueCoding": {
+          "system": "https://hl7.org/fhir/R4/medications-module.html",
+          "code": "ImmunizationRecommendation",
+          "display": "Immunization Recommendation"
+        }
+      } ]
+    }, {
+      "linkId": "2.4",
+      "text": "Specific resource identifier?",
+      "type": "string",
+      "required": false
+    } ]
+  } ]
+}

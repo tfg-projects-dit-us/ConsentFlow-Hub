@@ -1,0 +1,11 @@
+---
+
+services:
+  traefik:
+    image: hapiproject/hapi:v7.0.3
+    container_name: hapi
+    ports:
+      - 8080:8080
+    volumes:
+      - ./application.yaml:/app/config/application.yaml
+    restart: unless-stopped
