@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Questionnaire item types</title>
+	<link rel="stylesheet" href="/form-styles.css">
+	<!-- Autor: Marco Antonio Maldonado Orozco -->
+</head>
+
+<body>
+
+	<div th:fragment="display(item)">
+		<label th:text="${item.text}"/>
+	</div>
+
+	<div th:fragment="group(item)" class="group-container">
+		<label th:text="${item.type}"/>
+		<span th:each="subitem : ${item.item}" th:switch="${#strings.toString(subitem.type)}">
+			<span th:case="'DISPLAY'" th:insert="~{:: display(${subitem})}"/>
+			<span th:case="'QUESTION'" th:insert="~{:: question(${subitem})}"/>
+			<span th:case="'GROUP'" th:insert="~{:: group(${subitem})}"/>
+			<span th:case="*" th:insert="~{:: leaf(${subitem})}"/>
+		</span>
+	</div>
+
+	<div th:fragment="question(item)" class="question-container">
+		<label th:text="${item.text}" class="question-title"/>
+		<th:block th:each="subitem : ${item.item}" th:switch="${#strings.toString(subitem.type)}">
+			<span th:case="'DISPLAY'" th:insert="~{:: display(${subitem})}" th:text="${subitem.type}"/>
+			<span th:case="'QUESTION'" th:insert="~{:: question(${subitem})}"
+				th:text="${subitem.type}"></span>
+			<span th:case="'GROUP'" th:insert="~{:: group(${subitem})}" th:text="${subitem.type}"/>
+			<span th:case="*" th:replace=":: leaf(${subitem})" th:text="${subitem.type}"/>
+		</th:block>
+	</div>
+	
+	<div th:fragment="leaf(item)" class="leaf-container">
+		<!-- Este fragment se ha hecho para controlar los items con tipos simples que NO sean display, question o group.-->
+		<th:block th:switch="${#strings.toString(item.type)}">
+			<div th:case="'BOOLEAN'" th:insert="~{:: boolean(${item})}"/>
+			<div th:case="'TEXT'" th:insert="~{:: text(${item})}"/>
+			<div th:case="'STRING'" th:insert="~{:: string(${item})}"/>
+			<div th:case="'CODING'" th:insert="~{:: coding(${item})}"/>
+			<div th:case="'QUANTITY'" th:insert="~{:: quantityOrIntegerOrDecimal(${item})}"/>
+			<div th:case="'URL'" th:insert="~{:: url(${item})}"/>
+			<div th:case="'INTEGER'" th:insert="~{:: quantityOrIntegerOrDecimal(${item})}"/>
+			<div th:case="'DECIMAL'" th:insert="~{:: quantityOrIntegerOrDecimal(${item})}"/>
+			<div th:case="'REFERENCE'" th:insert="~{:: reference(${item})}"/>
+			<div th:case="'ATTACHMENT'" th:insert="~{:: attachment(${item})}"/>
+			<div th:case="'DATE'" th:insert="~{:: date(${item})}"/>
+			<div th:case="'TIME'" th:insert="~{:: time(${item})}"/>
+			<div th:case="'DATETIME'" th:insert="~{:: datetime(${item})}"/>
+			<div th:case="*">
+				<label th:text="#{unknownQuestion}" class="error-label"/>
+			</div>
+		</th:block>
+	</div>
+
+	<div th:fragment="boolean(item)">
+		<div th:replace="~{fragments/booleanFragment :: boolean}"/>
+	</div>
+
+	<div th:fragment="coding(item)">
+		<div th:replace="~{fragments/codingFragment :: coding}"/>
+	</div>
+
+	<div th:fragment="text(item)">
+		<div th:replace="~{fragments/textFragment :: text}"/>
+	</div>
+	
+	<div th:fragment="string(item)">
+		<div th:replace="~{fragments/stringFragment :: string}"/>
+	</div>
+	
+	<div th:fragment="quantityOrIntegerOrDecimal(item)">
+	    <div th:replace="~{fragments/quantityIntegerAndDecimalFragment :: quantityIntegerAndDecimal}"/>
+	</div>
+	
+	<div th:fragment="url(item)">
+		<div th:replace="~{fragments/urlFragment :: url}"/>
+	</div>
+	
+	<div th:fragment="reference(item)">
+		<div th:replace="~{fragments/referenceFragment :: reference}"/>
+	</div>
+
+	<div th:fragment="attachment(item)">
+		<div th:replace="~{fragments/attachmentFragment :: attachment}"/>
+	</div>
+	
+	<div th:fragment="date(item)">
+		<div th:replace="~{fragments/dateFragment :: date}"/>
+	</div>
+	
+	<div th:fragment="time(item)">
+		<div th:replace="~{fragments/timeFragment :: time}"/>
+	</div>
+	
+	<div th:fragment="datetime(item)">
+		<div th:replace="~{fragments/datetimeFragment :: datetime}"/>
+	</div>
+
+</body>
+
+</html>

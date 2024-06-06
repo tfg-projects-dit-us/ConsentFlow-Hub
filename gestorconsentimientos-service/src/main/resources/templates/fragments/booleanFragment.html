@@ -1,0 +1,10 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<div th:fragment="boolean">
+	<div class="boolean-question">	
+		<!-- La label es para englobar el checkbox y el texto y el check se marque también cuando se clica el texto-->		
+		<label>
+			<input type="checkbox" th:id="${item.linkId + '~boolean'}" th:name="${item.linkId}" th:required="${item.required}" th:disabled="${item.readOnly}" />
+			<span th:text="${item.text}"/>
+		</label>
+	</div>
+</div>

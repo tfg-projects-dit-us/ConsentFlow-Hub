@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- Ayuda con edicion html https://www.w3schools.com/howto/default.asp -->
+<html>
+
+<head>
+	<title th:text="#{application.title}"></title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="/form-styles.css">
+	<!-- Autor: Marco Antonio Maldonado Orozco -->
+</head>
+
+<body>
+	<div th:insert="components/navbar.html"/>
+	<div class="title-container">
+		<h3 th:id="questionnaireId" class="title" th:text="${questionnaire.id}" />
+	</div>
+	<!-- El enctype es para que permita enviar archivos, para los items de tipo attachment -->
+	<form th:action="@{/facultativo/solicitud}" method="post" enctype="multipart/form-data">
+		<input type="hidden" th:id="questionnaireId" th:name="questionnaireId" th:value="${questionnaire.id}">
+		<div th:each="item : ${questionnaire.item}">
+			<div th:switch="${#strings.toString(item.type)}">
+				<div th:case="'DISPLAY'" th:insert="~{itemsTypes :: display(${item})}"/>
+				<div th:case="'QUESTION'" th:insert="~{itemsTypes :: question(${item})}"/>
+				<div th:case="'GROUP'" th:insert="~{itemsTypes :: group(${item})}"/>
+				<div th:case="*" th:insert="~{itemsTypes :: leaf(${item})}"/>
+			</div>
+		</div>
+		<button type="submit">Enviar respuesta</button>
+	</form>
+	
+	<script th:src="@{/js/scripts.js}"></script>
+</body>
+
+</html>

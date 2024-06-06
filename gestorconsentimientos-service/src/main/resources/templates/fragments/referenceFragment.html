@@ -1,0 +1,30 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<!-- Fragment para representar las preguntas de tipo referencia
+		1. Vienen las opciones posibles en el answerOption:
+			En este caso se crea un select de respuesta única o múltiple según el atributo repeats y se tendrá que seleccionar una de las
+			respuestas predefinidas.
+		2. No vienen opciones posibles en el answerOption:
+			En este caso se crea un input de tipo url que comprueba que la url debe contener la palabra "fhir" para garantizar que es
+			un recurso. Además si hay varias respuestas posibles se habilitará un botón que añadirá más inputs con las mismas características. -->
+<div th:fragment="reference">
+	<label th:text="${item.text}" class="question-title"/>
+	<th:block th:if="${item.answerOption != null and not #lists.isEmpty(item.answerOption)}">
+	    <select th:id="${item.linkId + '~select'}" th:name="${item.linkId + '~reference'}" th:required="${item.required}" th:multiple="${item.repeats}">
+	        <option th:each="option : ${item.answerOption}"
+	                th:value="${option.valueReference.reference}"
+	                th:selected="${option.initialSelected}"
+	                th:text="${option.valueReference.display}" />
+	    </select>
+	</th:block>
+	<!-- Alternativa de introducir a mano cuando no hay opciones disponibles -->
+	<th:block th:unless="${item.answerOption != null and not #lists.isEmpty(item.answerOption)}">
+		 <!-- Este contenedor es para identificar donde se insertarán los inputs, su nombres es linkId de la pregunta + -tipo_de_input + -container -->
+	    <div th:id="${item.linkId + '~reference-container'}">				
+	        <input type="url" th:id="${item.linkId + '~reference'}" th:name="${item.linkId}" 
+				th:placeholder="#{question.reference.inputPlaceholder}" th:required="${item.required}"/>
+		</div>
+		<th:block th:if="${item.repeats}">
+			<input type="button" th:value="#{question.addOtherAnswer}" th:attr="onclick='agregarOtraReferencia(\'' + ${item.linkId} + '\')'"/>
+	  	</th:block>
+	</th:block>
+</div>

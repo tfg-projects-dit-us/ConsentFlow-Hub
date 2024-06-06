@@ -1,0 +1,14 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<div th:fragment="quantityIntegerAndDecimal" class="quantity-container">
+    <label th:text="${item.text}" class="question-title"/>
+    <!-- Este contenedor es para identificar donde se insertarán los inputs, su nombres es linkId de la pregunta + -tipo_de_input + -container -->
+    <div  th:id="${item.linkId + '~number-container'}">	
+		<!-- Según el tipo de input se calcula el step y se muestra la label-->		
+	    <input type="number" th:id="${item.linkId + '~' + item.type}" th:name="${item.linkId}" th:required="${item.required}" 
+	    	th:step="${#strings.equals(item.type, 'QUANTITY') ? '0.1' : #strings.equals(item.type, 'DECIMAL') ? '0.01' : '1'}" />
+	    <label th:if="${#strings.equals(item.type, 'QUANTITY')}" class="unit-label" th:text="${item.answerOption[0].valueCoding.display}"/>
+	</div>
+    <th:block th:if="${item.repeats}">
+  		<input type="button" th:value="#{question.addOtherAnswer}" th:attr="onclick='agregarOtroInputNumber(\'' + ${item.linkId} + '\', \'' + ${item.type} + '\')'"/>
+  	</th:block>
+</div>

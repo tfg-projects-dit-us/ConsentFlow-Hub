@@ -2,7 +2,7 @@
 <!-- Autor: Javier -->
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
     <head>
-        <title>Gestor de Consentimientos</title>
+        <title th:text="#{application.title}"></title>
         <meta charset="ISO-8859-1">
         <link rel="stylesheet" href="/form-styles.css">        
     </head>
@@ -29,7 +29,7 @@
                     <td th:text="${requestConsent.getPatient()}">Error</td>
                     <td th:text="${requestConsent.getRequestQuestionnaireId()}">Error</td>
                     <td th:text="${requestConsent.getRequestQuestionnaireResponseId()}">Error</td>	
-                    <td><button class="button" th:data-url="@{/paciente/solicitud?id={id}(id=${requestConsent.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
+                    <td><button class="button" th:data-url="@{/facultativo/solicitudes/{id}(id=${requestConsent.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
                 </tr>
             </tbody>
         </table>

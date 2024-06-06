@@ -1,0 +1,5 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<div th:fragment="attachment">
+	<label th:for="${item.linkId}" th:text="${item.text}" class="question-title"/>
+	<input type="file" th:id="${item.linkId + '~attatchment'}" th:name="${item.linkId}" th:required="${item.required}" th:multiple="${item.repeats}" />
+</div>

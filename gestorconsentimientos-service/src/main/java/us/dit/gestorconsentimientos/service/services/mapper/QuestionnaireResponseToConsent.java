@@ -91,12 +91,9 @@ public class QuestionnaireResponseToConsent {
 
 				// Elemento "1.3" - periodo
 				if (qrItemComponent.getLinkId().equals("1.3")){
-					String aux = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue();
-					String[] start = aux.split(";")[0].split("-");
-					String[] end = aux.split(";")[1].split("-");
+					String[] end = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue().split("-");
 					
 					Calendar startCalendar = Calendar.getInstance();
-					startCalendar.set(Integer.parseInt(start[0]),Integer.parseInt(start[0]),Integer.parseInt(start[0]));
 	
 					Calendar endCalendar = Calendar.getInstance();
 					endCalendar.set(Integer.parseInt(end[0]),Integer.parseInt(end[0]),Integer.parseInt(end[0]));
@@ -106,6 +103,23 @@ public class QuestionnaireResponseToConsent {
 					
 				}
 	
+				// Elemento "1.3" - periodo
+				//if (qrItemComponent.getLinkId().equals("1.3~date")){
+				//	String aux = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue();
+				//	String[] start = aux.split(";")[0].split("-");
+				//	String[] end = aux.split(";")[1].split("-");
+				//	
+				//	Calendar startCalendar = Calendar.getInstance();
+				//	startCalendar.set(Integer.parseInt(start[0]),Integer.parseInt(start[0]),Integer.parseInt(start[0]));
+				//
+				//	Calendar endCalendar = Calendar.getInstance();
+				//	endCalendar.set(Integer.parseInt(end[0]),Integer.parseInt(end[0]),Integer.parseInt(end[0]));
+				//
+				//	// Establecimiento del periodo que el consentimiento es válido
+				//	consent.setPeriod(new Period().setStart(startCalendar.getTime()).setEnd(endCalendar.getTime()));
+				//	
+				//}
+
 				// Elemento "1.4"
 				if (qrItemComponent.getLinkId().equals("1.4")){
 					
@@ -125,11 +139,11 @@ public class QuestionnaireResponseToConsent {
 	
 				}
 	
-				//TODO 2.1
+				//TODO 2.1~date
 	
-				//TODO 2.2
+				//TODO 2.2~string
 	
-				// Elemento "2.3"
+				// Elemento "2.3~select"
 				if (qrItemComponent.getLinkId().equals("2.3")){
 					
 					String[] codeList = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue().split(";");
@@ -140,7 +154,7 @@ public class QuestionnaireResponseToConsent {
 	
 				}
 	
-				// Elemento "2.4"
+				// Elemento "2.4~string"
 				if (qrItemComponent.getLinkId().equals("2.4")){
 	
 					provision.addData(

@@ -1,0 +1,12 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<div th:fragment="date">
+  <label th:text="${item.text}" class="question-title"/>
+  <!-- Este contenedor es para identificar donde se insertarán los inputs, su nombres es linkId de la pregunta + -tipo_de_input + -container -->
+  <div th:id="${item.linkId + '~date-container'}">  
+  	<input type="date" th:id="${item.linkId + '~date'}" th:name="${item.linkId}" th:required="${item.required}" />
+  </div>
+  <!-- Si repeats es true, permite la entrada de múltiples fechas añadiendolas conforme sea necesario-->
+  <th:block th:if="${item.repeats}">
+	<input type="button" th:value="#{question.addOtherAnswer}" th:attr="onclick='agregarOtroInput(\'' + ${item.linkId} + '\', \'date\')'"/>
+  </th:block>
+</div>

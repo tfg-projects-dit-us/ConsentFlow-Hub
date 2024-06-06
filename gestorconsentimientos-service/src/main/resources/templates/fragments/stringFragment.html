@@ -1,0 +1,11 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<div th:fragment="string">
+	<label for="${item.LinkId}" th:text=${item.Text} class="question-title"/>
+	 <!-- Este contenedor es para identificar donde se insertarán los inputs, su nombres es linkId de la pregunta + -tipo_de_input + -container -->
+	<div th:id="${item.linkId + '~text-container'}">  
+		<input type="text" th:id="${item.LinkId + '~string'}" th:name="${item.LinkId}" th:required="${item.required}" th:readonly="${item.readOnly}">
+	</div>
+	<th:block th:if="${item.repeats}">
+  		<input type="button" th:value="#{question.addOtherAnswer}" th:attr="onclick='agregarOtroInput(\'' + ${item.linkId} + '\', \'text\')'"/>
+  	</th:block>
+</div>

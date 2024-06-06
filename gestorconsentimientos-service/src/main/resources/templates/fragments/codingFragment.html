@@ -1,0 +1,135 @@
+<!-- Autor: Marco Antonio Maldonado Orozco -->
+<!--Pregunta con respuesta/s de tipo coding (Hay más anotaciones dentro del mismo código)
+	1. La pregunta tiene una sola respuesta
+		1.1 La pregunta tiene 3 o menos respuestas posibles
+			1.1.1 La pregunta NO tiene opción extra con answerConstraint:
+				En este caso cada respuesta se verá representada con un input de tipo radio de los cuales solo se puede seleccionar
+				una respuesta a la vez.
+			1.1.2 La pregunta SI tiene opción extra con answerConstraint:
+				En este caso cada respuesta se verá representada con un input de tipo radio de los cuales solo se puede seleccionar
+				una respuesta a la vez, además según el tipo de respuesta extra se representará de una forma u otra, añadiendo los
+				inputs de texto nececesarios. Como estamos en el punto 1, si se clica algún input de texto se deseleccionará el input
+				radio que haya previamente seleccionado, y si se clica en un radio se limpiarán los inputs de opción extra.
+		1.2 La pregunta tiene más de 3 respuestas posibles:
+			1.2.1, 1.2.2 Tenga o no tenga opción extra el funcionamiento es igual al descrito en los puntos 1.1.1 y 1.1.2, salvo que 
+				las opciones posibles estarán representadas en un input de tipo select en lugar de en inputs radio, siendo posible
+				seleccionar una sola respuesta. Esto es simplemente por decisión de diseño para facilitar la interacción.
+	2. La pregunta tiene más de una respuesta
+		2.1 La pregunta tiene 3 o menos respuestas posibles
+			2.1.1 La pregunta NO tiene opción extra con answerConstraint:
+				En este caso cada respuesta se verá representada con un input de tipo checkbox, pudiendo seleccionar todos los que
+				se considere oportunos al ser respuesta múltiple.
+			2.1.2 La pregunta SI tiene opción extra con answerConstraint:
+				Igual a lo descrito en el 2.1.1. Además de eso estarán disponible los inputs de tipo texto para
+				rellenar la respuesta extra.
+		2.2 La pregunta tiene más de 3 respuestas posibles
+			2.2.1, 2.2.2 Tenga o no tenga opción extra el funcionamiento es igual al descrito en los puntos 2.1.1 y 2.1.2, salvo que
+			las opciones posibles estarán representadas con un input de tipo select en lugar de checkbox, en este input se podrán seleccionar
+			varias respuesta usando la tecla CTRL. -->
+	<div th:fragment="coding"  class="coding-container">
+		<label th:id="${item.linkId + '-title'}" th:text="${item.text}" class="question-title"/>
+		<!--  Presentaci�n de las answerOption incluidas en la pregunta -->
+		<span th:id="codingAnswerOptions" th:if="${item.answerOption!=null}">
+			<!-- CASO 2: Verifica si item.repeats es true o false, si est� permitida una o varias respuestas-->
+			<span th:if="${item.repeats}" th:required="${item.required}">
+				<!-- CASO 2.1 Si item.repeats es true, permite elegir múltiples opciones -->
+				 <th:block th:if="${#lists.size(item.answerOption) <= 3}">
+	                <!-- Si hay 3 o menos opciones, utiliza checkboxes -->
+	                <th:block th:each="option, iter : ${item.answerOption}">
+	                    <!-- Para cada opción se construye un checkbox -->
+	                    <label>
+	                        <input type="checkbox" th:id="${item.linkId + '~checkbox-' + iter.index}" th:name="${item.linkId}" th:value="${option.valueCoding.code}"
+	                            th:checked="${option.initialSelected}" th:required="${item.required}" th:disabled="${item.readOnly}" />
+	                        <span th:text="${option.valueCoding.display}" />
+	                    </label>
+	                </th:block>
+	            </th:block>
+	            <!-- CASO 2.2 Si hay más de 3 opciones, utiliza un select de selección múltiple -->
+	            <th:block th:if="${#lists.size(item.answerOption) > 3}">
+	                <label th:text="#{question.coding.multipleOptionsLabel}"/>
+	                <select th:id="${item.linkId + '~select'}" th:name="${item.linkId}" multiple="true"
+	                        th:required="${item.required}" th:disabled="${item.readOnly}">
+	                    <option th:each="option, iter : ${item.answerOption}" th:id="${item.linkId + '~option' + iter.index}" th:name="${item.linkId}" th:value="${option.valueCoding.code}"
+	                            th:selected="${option.initialSelected}" th:text="${option.valueCoding.display}" />
+	                </select>
+	            </th:block>
+	            <!-- Los nombres de los input llevan el linkId de la pregunta + '-text' para poder identificarlos para la lógica de 
+				ponerlos en blanco cuando se clique un radius.
+				Además el onclick está en el th:attr porque thymeleaf no tiene atributo onclick, y es la única forma de que coja el
+				parámetro como el valor de la variable y no como una cadena, y se le pasa el linkId para identificar a los radius y 
+				deseleccionarlos si se clica un input de texto -->
+				<!-- Se comprueba si la opción extra es de tipo string o de otro tipo -->
+				<th:block th:if="${item.answerConstraint!=null and #strings.toString(item.answerConstraint)=='OPTIONSORSTRING'}">
+					<label th:text="#{question.coding.extraOption.string}"/>
+					<input type="text" th:name="${item.linkId + '~extraString'}" th:readonly="${item.readOnly}"/>
+				</th:block>
+				<th:block th:if="${item.answerConstraint!=null and #strings.toString(item.answerConstraint)=='OPTIONSORTYPE'}">
+					<br>
+					<label th:text="#{question.coding.extraOption.other}"/>
+					<!-- Los nombres de los input llevan el linkId de la pregunta + un identificador -Tipo-Especificación,
+					por ejemplo -text-code para un tipo text, que sirve para el campo code, para así poder identificarlos si fuese necesario -->
+					<label for="code" th:text="#{questionnaire.code.code}"/>
+					<input type="text" th:id="${item.linkId+ '~text-code'}" th:name="${item.linkId}" th:readonly="${item.readOnly}">
+					<br>
+					<label for="system" th:text="#{questionnaire.code.system}"/>
+					<input type="text" th:id="${item.linkId+ '~text-system'}" th:name="${item.linkId}" th:readonly="${item.readOnly}">
+					<br>
+					<label for="version" th:text="#{questionnaire.code.version}"/>
+					<input type="text" th:id="${item.linkId+ '~text-version'}" th:name="${item.linkId}" th:readonly="${item.readOnly}">
+					<br>
+					<label for="display" th:text="#{questionnaire.code.display}"/>
+					<input type="text" th:id="${item.linkId+ '~text-display'}" th:name="${item.linkId}" th:readonly="${item.readOnly}">
+					<br>
+				</th:block>
+			</span>
+			<!-- CASO 1 Maneja cuando la pregunta solo tiene una sola respuesta posible -->
+			<span th:if="${!item.repeats or item.repeats==null}">
+				<!-- CASO 1.1 En caso de que haya 3 o menos opciones crea los radios -->
+				<th:block th:if="${#lists.size(item.answerOption) <= 3}">
+					<th:block th:each="option : ${item.answerOption}">
+			            <!-- Crea radio buttons si hay 3 opciones o menos -->
+			            <label>
+				            <input type="radio" th:id="${item.linkId}" th:name="${item.linkId}" th:value="${option.valueCoding.code}"
+				                th:checked="${option.initialSelected}" th:required="${item.required}" onchange="handleRadioChange(this)" />
+			                <span th:text="${option.valueCoding.display}" />
+			            </label>
+			        </th:block>
+				</th:block>
+				<!-- CASO 1.2 En caso de que haya más de 3 opciones crea el select -->
+		        <th:block th:if="${#lists.size(item.answerOption) > 3}">
+		            <!-- Crea un select si hay más de 3 opciones -->
+		            <label th:text="#{question.coding.simpleOptionsLabel}"/>
+	                <select th:id="${item.linkId + '~select'}" th:name="${item.linkId}"
+	                        th:required="${item.required}" th:disabled="${item.readOnly}" onchange="handleSelectChange(this)">
+	                    <option th:each="option : ${item.answerOption}" th:value="${option.valueCoding.code}"
+	                            th:selected="${option.initialSelected}" th:text="${option.valueCoding.display}" />
+	                </select>
+		        </th:block>
+				<!-- Los nombres de los input llevan el linkId de la pregunta + '-text' para poder identificarlos para la lógica de 
+				ponerlos en blanco cuando se clique un radius.
+				Además el onclick está en el th:attr porque thymeleaf no tiene atributo onclick, y es la única forma de que coja el
+				parámetro como el valor de la variable y no como una cadena, y se le pasa el linkId para identificar a los radius y 
+				deseleccionarlos si se clica un input de texto -->
+				<th:block th:if="${item.answerConstraint!=null and #strings.toString(item.answerConstraint)=='OPTIONSORSTRING'}">
+				    <label th:text="#{question.coding.extraOption.string}"/>
+				    <input type="text" th:name="${item.linkId}" th:id="${item.linkId+ '~text'}" th:attr="onclick='handleTextInputClick(\'' + ${item.linkId} + '\')'" th:readonly="${item.readOnly}"/>
+				</th:block>
+				<th:block th:if="${item.answerConstraint!=null and #strings.toString(item.answerConstraint)=='OPTIONSORTYPE'}">
+					<br>
+					<label th:text="#{question.coding.extraOption.other}"/>
+					<label for="${item.linkId+ '~code'}" th:text="#{questionnaire.code.code}"/>
+				    <input type="text" th:id="${item.linkId+ '~text'}" th:name="${item.linkId}" th:attr="onclick='handleTextInputClick(\'' + ${item.linkId} + '\')'" th:readonly="${item.readOnly}">
+				    <br>
+				    <label for="${item.linkId+ '-system'}" th:text="#{questionnaire.code.system}"/>
+				    <input type="text" th:id="${item.linkId+ '~text'}" th:name="${item.linkId}" th:attr="onclick='handleTextInputClick(\'' + ${item.linkId} + '\')'" th:readonly="${item.readOnly}">
+				    <br>
+				    <label for="${item.linkId+ '-version'}" th:text="#{questionnaire.code.version}"/>
+				    <input type="text" th:id="${item.linkId+ '~text'}" th:name="${item.linkId}" th:attr="onclick='handleTextInputClick(\'' + ${item.linkId} + '\')'" th:readonly="${item.readOnly}">
+				    <br>	
+					<label for="${item.linkId+ '-display'}" th:text="#{questionnaire.code.display}"/>
+					<input type="text" th:id="${item.linkId+ '~text'}" th:name="${item.linkId}" th:attr="onclick='handleTextInputClick(\'' + ${item.linkId} + '\')'" th:readonly="${item.readOnly}">
+					<br>
+				</th:block>
+			</span>
+		</span>
+	</div>

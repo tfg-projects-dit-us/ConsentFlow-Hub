@@ -18,9 +18,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import us.dit.gestorconsentimientos.model.RequestedConsent;
 import us.dit.gestorconsentimientos.model.ReviewedConsent;
@@ -29,6 +29,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
 import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
 import us.dit.gestorconsentimientos.service.services.kie.process.ConsentRequestProcessService;
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
+import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToConsent;
 import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireToFormPractitioner;
 
 
@@ -54,6 +55,8 @@ public class PractitionerController {
 	@Autowired
 	private QuestionnaireToFormPractitioner questionnaireToFormPractitionerMapper;
 
+	@Autowired
+	private QuestionnaireResponseToConsent qrToConsent;
 
 	private Map<String, String[]> deleteFielsPatients(Map<String, String[]> response){
 		Map<String, String[]> result = new HashMap<String, String[]>();
@@ -62,7 +65,7 @@ public class PractitionerController {
 			String key = entry.getKey();
 			String[] values = entry.getValue();
 			
-			if (!(key.equals("1.2"))) {
+			if (!(key.equals("patients~string"))) {
 				result.put(key, values);
 			}
 		}		
@@ -107,7 +110,7 @@ public class PractitionerController {
      * @return "practitioner-request-questionnarie" plantilla thymeleaf
      */
     @GetMapping("/facultativo/solicitar")
-    @ResponseBody
+    //@ResponseBody
     public String getPractitionerRequestQuestionnarie(HttpSession httpSession, Model model) {
         
         logger.info("IN --- /facultativo/solicitar");
@@ -146,7 +149,9 @@ public class PractitionerController {
 
         logger.info("OUT --- /facultativo/solicitar");
         //return "practitioner-request-questionnarie";
-        return questionnaireToFormPractitionerMapper.map(requestQuestionnarie);
+        //return questionnaireToFormPractitionerMapper.map(requestQuestionnarie);
+        model.addAttribute("questionnaire", requestQuestionnarie.getResource());
+		return "questionnaireForm";
     }
 
 
@@ -183,9 +188,16 @@ public class PractitionerController {
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         formResponse = request.getParameterMap();
         patientList = Arrays.asList(formResponse.get("patients")[0].split(";"));
-        qestionnaireResponse = mapToQuestionnaireResponseMapper.map(deleteFielsPatients(formResponse));
+        qestionnaireResponse = mapToQuestionnaireResponseMapper.map(formResponse);
         qestionnaireResponse.setServer(fhirServer);
         requestQuestionnarieResponseId = fhirDAO.save(qestionnaireResponse);
+
+        // TODO ELIMINAR - PRUEBA TEMPORAL
+        // Generación de un recurso Consent
+        FhirDTO consent = qrToConsent.map(qestionnaireResponse);
+        consent.setServer(fhirServer);
+        Long consentId = fhirDAO.save(consent);
+        logger.info("Consent ID: " + consentId);
 
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
@@ -196,7 +208,7 @@ public class PractitionerController {
         
         logger.info("OUT --- POST /facultativo/solicitud");
         
-        return "redirect:/facultativo/solicitud/?id="+processInstanceId.toString();
+        return "redirect:/facultativo/solicitudes/"+processInstanceId.toString();
     }
      
     /**
@@ -242,8 +254,8 @@ public class PractitionerController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada la solicitud de consentimiento
      * @return "practitioner-request-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/solicitud")
-    public String getPractitionerRequestById(Model model, @RequestParam Long id) {
+    @GetMapping("/facultativo/solicitud/{id}")
+    public String getPractitionerRequestById(Model model, @PathVariable Long id) {
         
         logger.info("IN --- /facultativo/solicitud");
         
@@ -299,8 +311,8 @@ public class PractitionerController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "practitioner-consent-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/consentimiento")
-    public String getPractitionerConsentById(Model model, @RequestParam Long id) {
+    @GetMapping("/facultativo/consentimiento/{id}")
+    public String getPractitionerConsentById(Model model, @PathVariable Long id) {
 
         logger.info("IN --- /facultativo/consentimiento");
         

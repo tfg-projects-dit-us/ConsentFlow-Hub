@@ -199,16 +199,11 @@ public class QuestionnaireToFormPatient implements IMapper<FhirDTO, String> {
 		String question = item.getText();
 		String id = item.getLinkId();
 		String value = item.getAnswerOption().get(0).getValue().toString();
-		String[] dates = value.split(";");
 		
 		String component = "	<label for=\"" + id + "\">" + question + "</label>\r\n"
 				+ "     <div>\r\n"
-				+ "     <span>Start:</span>\r\n"
-				+ "		<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + dates[0] + "\" readonly>\r\n"
-				+ "     </div>\r\n"
-				+ "     <div>\r\n"
-				+ "     <span>Start:</span>\r\n"
-				+ "		<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + dates[1] + "\" readonly>\r\n"
+				+ "     <span>End:</span>\r\n"
+				+ "		<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + value+ "\" readonly>\r\n"
 				+ "     </div>\r\n";
 		
 		return component;

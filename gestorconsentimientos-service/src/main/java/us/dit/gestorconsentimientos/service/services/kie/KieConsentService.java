@@ -178,41 +178,44 @@ public class KieConsentService {
         for (ProcessInstanceWithVarsDesc pi:processInstanceParentDescList){
             processInstanceIdRequestList.add(pi.getId().toString());
         }
-        
-        // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
-        // por <practitioner>, y que tienen su tarea humana sin completar
-        processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(
-                new ArrayList<QueryParam>(){{ 
-                        add(QueryParam.in(QueryResultMapper.COLUMN_PARENTPROCESSINSTANCEID, processInstanceIdRequestList));
-                        add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
-                        add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_NAME, reviewHumanTaskName));
-                        add(QueryParam.in(AdvanceRuntimeDataService.TASK_ATTR_STATUS, new ArrayList<String>(){{
-                            add( Status.Created.toString());
-                            add( Status.Ready.toString());
-                            add( Status.Reserved.toString());
-                            add( Status.InProgress.toString());
-                        }}));
-                        }},
-                null,
-                null,
-                (QueryParam) null,
-                new QueryContext());
-        
-        // Obtención de las variables que forman parte de cada consentimiento
-        for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
-            
-            processInstanceVars = processInstanceDesc.getVariables();            
-            
-            consentsList.add(new RequestedConsent(
-                (Long) processInstanceDesc.getId(),
-                (String) processInstanceVars.get("fhirServer"),
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")),
-                (Date) processInstanceDesc.getDataTimeStamp(),
-                (String) processInstanceVars.get("practitioner"), 
-                (String) processInstanceVars.get("patient")));
-        }
 
+        // Evita una excepción en caso de que no haya ningún proceso aún
+        if (!processInstanceIdRequestList.isEmpty()){
+
+            // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
+            // por <practitioner>, y que tienen su tarea humana sin completar
+            processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(
+                    new ArrayList<QueryParam>(){{ 
+                            add(QueryParam.in(QueryResultMapper.COLUMN_PARENTPROCESSINSTANCEID, processInstanceIdRequestList));
+                            add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
+                            add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_NAME, reviewHumanTaskName));
+                            add(QueryParam.in(AdvanceRuntimeDataService.TASK_ATTR_STATUS, new ArrayList<String>(){{
+                                add( Status.Created.toString());
+                                add( Status.Ready.toString());
+                                add( Status.Reserved.toString());
+                                add( Status.InProgress.toString());
+                            }}));
+                            }},
+                    null,
+                    null,
+                    (QueryParam) null,
+                    new QueryContext());
+            
+            // Obtención de las variables que forman parte de cada consentimiento
+            for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
+                
+                processInstanceVars = processInstanceDesc.getVariables();            
+                
+                consentsList.add(new RequestedConsent(
+                    (Long) processInstanceDesc.getId(),
+                    (String) processInstanceVars.get("fhirServer"),
+                    (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
+                    (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")),
+                    (Date) processInstanceDesc.getDataTimeStamp(),
+                    (String) processInstanceVars.get("practitioner"), 
+                    (String) processInstanceVars.get("patient")));
+            }
+        }
         return consentsList;
     }
 
@@ -248,36 +251,40 @@ public class KieConsentService {
             processInstanceIdRequestList.add(pi.getId().toString());
         }
         
-        // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
-        // por <practitioner>
-        processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(
-                new ArrayList<QueryParam>(){{ 
-                        add(QueryParam.in(QueryResultMapper.COLUMN_PARENTPROCESSINSTANCEID, processInstanceIdRequestList));
-                        add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
-                        add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_NAME, reviewHumanTaskName));
-                        add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_STATUS, Status.Completed.toString()));
-                        }},
-                null,
-                null,
-                (QueryParam) null,
-                new QueryContext());
-        
-        // Obtención de las variables que forman parte de cada consentimiento
-        for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
+        // Evita una excepción en caso de que no haya ningún proceso aún
+        if (!processInstanceIdRequestList.isEmpty()){
+
+            // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
+            // por <practitioner>
+            processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(
+                    new ArrayList<QueryParam>(){{ 
+                            add(QueryParam.in(QueryResultMapper.COLUMN_PARENTPROCESSINSTANCEID, processInstanceIdRequestList));
+                            add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
+                            add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_NAME, reviewHumanTaskName));
+                            add(QueryParam.equalsTo(AdvanceRuntimeDataService.TASK_ATTR_STATUS, Status.Completed.toString()));
+                            }},
+                    null,
+                    null,
+                    (QueryParam) null,
+                    new QueryContext());
             
-            processInstanceVars = processInstanceDesc.getVariables();            
-            
-            consentsList.add(new ReviewedConsent(
-                (Long) processInstanceDesc.getId(),
-                (String) processInstanceVars.get("fhirServer"),
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
-                (Date) processInstanceDesc.getDataTimeStamp(),
-                (String) processInstanceVars.get("practitioner"), 
-                (String) processInstanceVars.get("patient"), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
-                (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                (Boolean) processInstanceVars.get("review")));
+            // Obtención de las variables que forman parte de cada consentimiento
+            for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
+                
+                processInstanceVars = processInstanceDesc.getVariables();            
+                
+                consentsList.add(new ReviewedConsent(
+                    (Long) processInstanceDesc.getId(),
+                    (String) processInstanceVars.get("fhirServer"),
+                    (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
+                    (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                    (Date) processInstanceDesc.getDataTimeStamp(),
+                    (String) processInstanceVars.get("practitioner"), 
+                    (String) processInstanceVars.get("patient"), 
+                    (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
+                    (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
+                    (Boolean) processInstanceVars.get("review")));
+            }
         }
 
         return consentsList;

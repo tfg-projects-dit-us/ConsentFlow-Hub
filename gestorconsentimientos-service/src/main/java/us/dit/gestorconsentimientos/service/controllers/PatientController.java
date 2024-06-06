@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -125,9 +126,9 @@ public class PatientController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "patient-request-individual" plantilla thymeleaf
      */
-    @GetMapping("/paciente/solicitud")
+    @GetMapping("/paciente/solicitudes/{id}")
     @ResponseBody
-    public String getPatientRequestById(HttpSession httpSession, @RequestParam Long id) {
+    public String getPatientRequestById(HttpSession httpSession, @PathVariable Long id) {
         //http://localhost:8090/paciente/solicitud?id=2
         logger.info("IN --- /paciente/solicitud");
         
@@ -209,7 +210,7 @@ public class PatientController {
         consentReviewProcessService.completeReviewTask(processInstanceId, results);
 
         logger.info("OUT --- POST /paciente/solicitud");
-        return "redirect:/paciente/consentimiento/?id="+processInstanceId.toString();
+        return "redirect:/paciente/consentimientos/"+processInstanceId.toString();
     }
 
     /**
@@ -255,8 +256,8 @@ public class PatientController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "patient-consent-individual" plantilla thymeleaf
      */    
-    @GetMapping("/paciente/consentimiento")
-    public String getPatientConsentById(Model model,@RequestParam Long id) {
+    @GetMapping("/paciente/consentimiento/{id}")
+    public String getPatientConsentById(Model model, @PathVariable Long id) {
 
         logger.info("IN --- /paciente/consentimiento");
 
