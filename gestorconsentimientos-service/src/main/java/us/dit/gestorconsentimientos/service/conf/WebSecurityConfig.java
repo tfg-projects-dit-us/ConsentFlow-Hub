@@ -62,7 +62,7 @@ public class WebSecurityConfig {
 		// codifico las password en https://bcrypt-generator.com/, uso nombre como
 		// password
 		// $2a$12$Pa3IIDS5JhAJpiLt5/lT4O5KVw1pyU.dVGpz/q7kEGUAH.JL85tRC
-		UserDetails user = User.withUsername("user").password(encoder.encode("user")).roles("kie-server").build();
+		UserDetails user = User.withUsername("user").password(encoder.encode("user")).roles("kie-server", "FACULTATIVO").build();
 		// $2a$12$irR0VcP4SdtvAn7cbnXXQ.Cnfk/NlLWZa4mnx0J8EeXFum8Pt1pfm
 		UserDetails wbadmin = User.withUsername("wbadmin").password(encoder.encode("wbadmin")).roles("admin").build();
 		//Este usuario se va a utilizar para el acceso al servidor

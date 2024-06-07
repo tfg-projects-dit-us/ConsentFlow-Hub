@@ -55,9 +55,6 @@ public class PractitionerController {
 	@Autowired
 	private QuestionnaireToFormPractitioner questionnaireToFormPractitionerMapper;
 
-	@Autowired
-	private QuestionnaireResponseToConsent qrToConsent;
-
 	private Map<String, String[]> deleteFielsPatients(Map<String, String[]> response){
 		Map<String, String[]> result = new HashMap<String, String[]>();
 		
@@ -192,13 +189,6 @@ public class PractitionerController {
         qestionnaireResponse.setServer(fhirServer);
         requestQuestionnarieResponseId = fhirDAO.save(qestionnaireResponse);
 
-        // TODO ELIMINAR - PRUEBA TEMPORAL
-        // Generación de un recurso Consent
-        FhirDTO consent = qrToConsent.map(qestionnaireResponse);
-        consent.setServer(fhirServer);
-        Long consentId = fhirDAO.save(consent);
-        logger.info("Consent ID: " + consentId);
-
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
         results.put("patientList",patientList);
@@ -254,7 +244,7 @@ public class PractitionerController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada la solicitud de consentimiento
      * @return "practitioner-request-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/solicitud/{id}")
+    @GetMapping("/facultativo/solicitudes/{id}")
     public String getPractitionerRequestById(Model model, @PathVariable Long id) {
         
         logger.info("IN --- /facultativo/solicitud");
@@ -311,7 +301,7 @@ public class PractitionerController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "practitioner-consent-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/consentimiento/{id}")
+    @GetMapping("/facultativo/consentimientos/{id}")
     public String getPractitionerConsentById(Model model, @PathVariable Long id) {
 
         logger.info("IN --- /facultativo/consentimiento");

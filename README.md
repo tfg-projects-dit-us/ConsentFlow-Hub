@@ -20,15 +20,15 @@ Los recursos disponibles a los que atiende la aplicación son los siguientes.
 - `/facultativo`: menú
 - `/facultativo/solicitar`: creación de la solicitud de consentimiento
 - `/facultativo/solicitudes`: listado de las solicitudes de consentimiento
-- `/facultativo/solicitud?id`: visualización de una solicitud de consentimiento concreta
+- `/facultativo/solicitudes/id`: visualización de una solicitud de consentimiento concreta
 - `/facultativo/consentimientos`: listado de los consentimientos
-- `/facultativo/consentimiento?id`: visualización de un consentimiento concreto
+- `/facultativo/consentimientos/id`: visualización de un consentimiento concreto
 
 - `/paciente`: menú
 - `/paciente/solicitudes`: listado de las solicitudes de consentimiento
-- `/paciente/solicitud?id`: visualización de una solicitud de consentimiento concreta
+- `/paciente/solicitudes/id`: visualización de una solicitud de consentimiento concreta
 - `/paciente/consentimientos`: listado de los consentimientos
-- `/paciente/consentimiento?id`: visualización de un consentimiento concreto
+- `/paciente/consentimientos/id`: visualización de un consentimiento concreto
 
 - `/management/deployedUnits`: se muestran en terminal todas las unidades de despliegue disponibles en el motor de procesos.
 - `/management/processInstances?detailed`: se muestran en terminal todas las instancias de proceso disponibles en el servidor, y en caso de indicar con "true" el parámetro "detailed", se mostrarán las tareas, variables y workItems de cada una de las instancias de proceso.

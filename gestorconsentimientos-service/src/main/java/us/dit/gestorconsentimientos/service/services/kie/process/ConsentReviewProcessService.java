@@ -8,6 +8,7 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.api.task.model.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -68,9 +69,18 @@ public class ConsentReviewProcessService {
         // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
         // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va
         // a ejecutar.
-        userTaskService.delegate(processInstanceId, defaultPotentialOwner, baDefaultUser);
         
-        userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser);
+        // En la primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
+        // pero el resto de veces que se acceda a este método tratando de iniciar la tarea, el usuario al que le 
+        // corresponde llevarla a cabo será el paciente.
+        if (userTaskInstanceDesc.getActualOwner().equals(defaultPotentialOwner)){
+            userTaskService.delegate(userTaskInstanceDesc.getTaskId(), defaultPotentialOwner, baDefaultUser);
+        }
+        
+        // Unicamente se modifica el estado de la tarea en caso de acceder a este método por primera vez, cuando el estado no es Inprogress
+        if (!userTaskInstanceDesc.getStatus().equals(Status.InProgress.toString())){
+            userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser);
+        }
 
         return vars;
     }

@@ -32,18 +32,23 @@ public class MenuController {
 
         Authentication auth = null;
         UserDetails userDetails = null;
+        String redirect = "redirect:/paciente";
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
         userDetails = (UserDetails) auth.getPrincipal();
+
         logger.info(" + user: " + userDetails.getUsername());
+        logger.info(" + Roles: " + auth.getAuthorities().toString());        
 
-        //TODO: Averiguar si el usuario es facultativo o no
-
-        //TODO: Redirigir a un recurso u otro según si el usuario es facultativo o no
+        // Los usuarios que tengan el rol de facultativo serán redirigidos a su pestaña
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_FACULTATIVO"))) {
+            redirect = "redirect:/facultativo";
+            logger.info(" + El usuario es un facultativo");
+        }        
 
         logger.info("OUT --- /menu");
-        return "redirect:/facultativo";
+        return redirect;
     }
     
 }
