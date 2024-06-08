@@ -166,7 +166,7 @@ public class PatientController {
         reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
 
         logger.info("OUT --- /paciente/solicitud");
-        //TODO plantilla Thymeleaf
+        //TODO plantilla Thymeleaf que muestre un formulario para aceptar o rechazar un una solicitud de consentimiento, que será necesario mostrar, a partir de un recurso FHIR de tipo QuestionnaireResponse
         //return "patient-request-individual";
         return reviewQuestionnarieForm;
     }
@@ -286,9 +286,7 @@ public class PatientController {
 
         logger.info("IN --- /paciente/consentimiento");
 
-        //TODO
-
-        //TODO plantilla Thymeleaf
+        //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent
 
         logger.info("OUT --- /paciente/consentimiento");
         return "patient-consent-individual" ;

@@ -55,13 +55,20 @@ public class ConsentReviewProcessService {
         WorkItem workItemInstance = null;
         UserTaskInstanceDesc userTaskInstanceDesc = null;
 
-        //TODO ¿Sería más correcto obtener las variables de la tarea (Son variables de entrada), y no del proceso?
-
+        // Las variables que indican el servidor fhir y el id que referencian al recurso FHIR Questionnaire
+        // que se utiliza para generar la solicitud de consentimiento, se obtienen actualmente de las variables
+        // del proceso, sin embargo se podría ahcer de otras maneras, por ejemplo a través del WorkItem, o de
+        // la tarea, de sus variables de entrada. Hay que tener claro que cada enfoque puede tener sus pros y 
+        // contras, y que implicará distintos caminos e información previa
         fhirServer = (String) processService.getProcessInstanceVariable(processInstanceId, "fhirServer");
         requestQuestionnaireResponseId = (Long) processService.getProcessInstanceVariable(processInstanceId, "requestQuestionnaireResponseId");
         vars.put("fhirServer",fhirServer);
         vars.put("requestQuestionnaireResponseId",requestQuestionnaireResponseId);
 
+        // FIXME Tratar de obtener WI mediante un identificador y no por posición
+        // La instancia de Work Item que se está obteniendo es la primera de las múltiples posibles tareas
+        // activas que puede haber en el proceso, por cómo está diseñado, solo puede haber una única tarea
+        // o nodo activo de manera simultánea, y por tanto un solo WI en esa lista.
         workItemInstance = processService.getWorkItemByProcessInstance(processInstanceId).get(0);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
 

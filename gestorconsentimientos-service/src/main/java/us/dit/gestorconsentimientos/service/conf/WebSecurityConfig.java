@@ -38,6 +38,7 @@ public class WebSecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+		// TODO Configuración de la seguridad Spring para permitir el acceso a ciertas URL según ROLES, y que no sea necesario iniciar sesión para acceder a la página principal...
 		http
 			.authorizeHttpRequests((authorizeHttpRequests) -> 
 				authorizeHttpRequests

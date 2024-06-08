@@ -74,7 +74,7 @@ public class QuestionnaireResponseToConsent {
 
 			logger.info("Has Answer: " + qrItemComponent.hasAnswer());
 			//Campo de respuesta
-			// TODO
+			// FIXME Asegurar que el mapeo que se lleva a cabo de las respuestas del cuestionario al consentimiento es semánticamente correcto
 			// Se supone que el paciente es la persona que se ve afectada, como la persona que acepta el consentimiento
 			if (qrItemComponent.hasAnswer()){
 				logger.info("LinkId: " + qrItemComponent.getLinkId());				
@@ -139,9 +139,9 @@ public class QuestionnaireResponseToConsent {
 	
 				}
 	
-				//TODO 2.1~date
+				//TODO elmento del cuestionario 2.1~date
 	
-				//TODO 2.2~string
+				//TODO elemento del cuestionario 2.2~string
 	
 				// Elemento "2.3~select"
 				if (qrItemComponent.getLinkId().equals("2.3")){

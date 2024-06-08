@@ -141,8 +141,6 @@ public class PractitionerController {
         httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("requestQuestionnaireId", requestQuestionnaireId);
         requestQuestionnarie = fhirDAO.get(fhirServer, "Questionnaire", requestQuestionnaireId);
-        
-        ///TODO plantilla Thymeleaf
 
         logger.info("OUT --- /facultativo/solicitar");
         //return "practitioner-request-questionnarie";
@@ -248,10 +246,8 @@ public class PractitionerController {
     public String getPractitionerRequestById(Model model, @PathVariable Long id) {
         
         logger.info("IN --- /facultativo/solicitud");
-        
-        //TODO
 
-        //TODO plantilla Thymeleaf
+        //TODO plantilla Thymeleaf que muestre una solicitud de consentimiento, a partir de un recurso FHIR de tipo QuestionnaireResponse
 
         logger.info("OUT --- /facultativo/solicitud");
         return "practitioner-request-individual";
@@ -306,10 +302,8 @@ public class PractitionerController {
 
         logger.info("IN --- /facultativo/consentimiento");
         
-        //TODO
+        //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent
 
-        //TODO plantilla Thymeleaf
-        
         logger.info("OUT --- /facultativo/consentimiento");
         return "practitioner-consent-individual";
     }
