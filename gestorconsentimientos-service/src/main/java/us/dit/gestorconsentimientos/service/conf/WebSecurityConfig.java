@@ -38,12 +38,14 @@ public class WebSecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		// TODO Configuración de la seguridad Spring para permitir el acceso a ciertas URL según ROLES, y que no sea necesario iniciar sesión para acceder a la página principal...
 		http
-			.authorizeHttpRequests((authorizeHttpRequests) -> 
-				authorizeHttpRequests
-					.antMatchers("/").permitAll()
-					.antMatchers("/*").authenticated())
+			.authorizeHttpRequests( (authorize) -> authorize
+				.antMatchers("/").permitAll()
+				.antMatchers("/form-styles.css").permitAll()
+				.antMatchers("/bussiness-application/**").permitAll()
+				.antMatchers("/paciente/**").hasRole("PACIENTE")
+				.antMatchers("/facultativo/**").hasRole("FACULTATIVO")
+				.anyRequest().authenticated())
 			.exceptionHandling((exceptionHandling) -> 
 				exceptionHandling
 					.accessDeniedPage("/access-denied.html"))
@@ -63,7 +65,7 @@ public class WebSecurityConfig {
 		// codifico las password en https://bcrypt-generator.com/, uso nombre como
 		// password
 		// $2a$12$Pa3IIDS5JhAJpiLt5/lT4O5KVw1pyU.dVGpz/q7kEGUAH.JL85tRC
-		UserDetails user = User.withUsername("user").password(encoder.encode("user")).roles("kie-server", "FACULTATIVO").build();
+		UserDetails user = User.withUsername("user").password(encoder.encode("user")).roles("kie-server", "FACULTATIVO", "PACIENTE").build();
 		// $2a$12$irR0VcP4SdtvAn7cbnXXQ.Cnfk/NlLWZa4mnx0J8EeXFum8Pt1pfm
 		UserDetails wbadmin = User.withUsername("wbadmin").password(encoder.encode("wbadmin")).roles("admin").build();
 		//Este usuario se va a utilizar para el acceso al servidor
@@ -71,7 +73,10 @@ public class WebSecurityConfig {
 		// $2a$12$1T7IYm0PmxpWyJFjqTSlm.489.s65TvHJbW4R7d1SG0giNHb5bqAm
 		UserDetails kieserver = User.withUsername("kieserver").password(encoder.encode("kieserver")).roles("kie-server").build();
 
-		return new InMemoryUserDetailsManager(wbadmin, user, kieserver, consentimientos);
+		UserDetails facultativo = User.withUsername("medico").password(encoder.encode("medico")).roles("kie-server", "FACULTATIVO").build();
+		UserDetails paciente = User.withUsername("paciente").password(encoder.encode("paciente")).roles("kie-server", "PACIENTE").build();
+
+		return new InMemoryUserDetailsManager(wbadmin, user, kieserver, consentimientos, facultativo, paciente);
 	}
 
 	@Bean

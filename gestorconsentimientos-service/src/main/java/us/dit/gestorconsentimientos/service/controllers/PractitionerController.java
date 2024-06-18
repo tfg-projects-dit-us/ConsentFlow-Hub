@@ -20,7 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import us.dit.gestorconsentimientos.model.RequestedConsent;
 import us.dit.gestorconsentimientos.model.ReviewedConsent;
@@ -29,9 +28,6 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
 import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
 import us.dit.gestorconsentimientos.service.services.kie.process.ConsentRequestProcessService;
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
-import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToConsent;
-import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireToFormPractitioner;
-
 
 /**
  * Controlador que va a atender las operaciones que van destinadas a los recursos que
@@ -51,23 +47,6 @@ public class PractitionerController {
 
     @Autowired
     private KieConsentService kieConsentService;
-
-	@Autowired
-	private QuestionnaireToFormPractitioner questionnaireToFormPractitionerMapper;
-
-	private Map<String, String[]> deleteFielsPatients(Map<String, String[]> response){
-		Map<String, String[]> result = new HashMap<String, String[]>();
-		
-		for (Map.Entry<String, String[]> entry : response.entrySet()) {
-			String key = entry.getKey();
-			String[] values = entry.getValue();
-			
-			if (!(key.equals("patients~string"))) {
-				result.put(key, values);
-			}
-		}		
-		return result;
-	}
 
     /**
      * Controlador que gestiona las operaciones GET al recurso "/facultativo".
