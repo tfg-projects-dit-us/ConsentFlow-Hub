@@ -12,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+//FIXME El uso del lenguaje no está funcionando correctamente
 /**
  * Configuración de la localización de la aplicación, la cual determinará el lenguaje 
  * que se empleará en las plantillas HTML.

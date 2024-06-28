@@ -57,7 +57,7 @@ public class ConsentReviewProcessService {
 
         // Las variables que indican el servidor fhir y el id que referencian al recurso FHIR Questionnaire
         // que se utiliza para generar la solicitud de consentimiento, se obtienen actualmente de las variables
-        // del proceso, sin embargo se podría ahcer de otras maneras, por ejemplo a través del WorkItem, o de
+        // del proceso, sin embargo se podría hacer de otras maneras, por ejemplo a través del WorkItem, o de
         // la tarea, de sus variables de entrada. Hay que tener claro que cada enfoque puede tener sus pros y 
         // contras, y que implicará distintos caminos e información previa
         fhirServer = (String) processService.getProcessInstanceVariable(processInstanceId, "fhirServer");
@@ -65,7 +65,6 @@ public class ConsentReviewProcessService {
         vars.put("fhirServer",fhirServer);
         vars.put("requestQuestionnaireResponseId",requestQuestionnaireResponseId);
 
-        // FIXME Tratar de obtener WI mediante un identificador y no por posición
         // La instancia de Work Item que se está obteniendo es la primera de las múltiples posibles tareas
         // activas que puede haber en el proceso, por cómo está diseñado, solo puede haber una única tarea
         // o nodo activo de manera simultánea, y por tanto un solo WI en esa lista.
@@ -76,8 +75,12 @@ public class ConsentReviewProcessService {
         // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
         // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va
         // a ejecutar.
+                
+        // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
+        // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
+        // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va a ejecutar.
         
-        // En la primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
+        // La primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
         // pero el resto de veces que se acceda a este método tratando de iniciar la tarea, el usuario al que le 
         // corresponde llevarla a cabo será el paciente.
         if (userTaskInstanceDesc.getActualOwner().equals(defaultPotentialOwner)){
