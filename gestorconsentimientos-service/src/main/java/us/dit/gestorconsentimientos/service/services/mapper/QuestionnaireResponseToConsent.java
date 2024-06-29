@@ -62,6 +62,8 @@ public class QuestionnaireResponseToConsent {
 		logger.info("qrItemComponentProcessing");
 		logger.info(qrItemComponentList);
 
+		// Los identificadores LinkId están definidos en el recurso Fhir Questionnaire el cual se rellena para obtener el QuestionnaireResponse, y a partir del cual se genera el recurso Consent.
+		// Los identificadores LinkId que se tratan aquí son los del QuestionnaireResponse, los cuales han podido ser modificados del Questionnaire al que responde, según cómo se haya construido a partir de un formulario HTML concreto...
 		for (QuestionnaireResponse.QuestionnaireResponseItemComponent qrItemComponent : qrItemComponentList){
 			
 			logger.info("qrItemComponent");
@@ -80,7 +82,7 @@ public class QuestionnaireResponseToConsent {
 				logger.info("LinkId: " + qrItemComponent.getLinkId());				
 				// Se obtiene la primera respuesta, suponiendo que no se está pasando el formulario más de una vez
 				
-				// Elemento "patients"
+				// Elemento "patients" - los pacientes a los que se les solicita el consentimiento
 				if (qrItemComponent.getLinkId().equals("patients")){
 					consent.setGrantor(new ArrayList<Reference>(){{
 						add(new Reference().setDisplay(qrItemComponent.getAnswerFirstRep().getValueStringType().getValue())); 
@@ -89,7 +91,7 @@ public class QuestionnaireResponseToConsent {
 					consent.setSubject(new Reference().setDisplay(qrItemComponent.getAnswerFirstRep().getValueStringType().getValue()));				
 				}
 
-				// Elemento "1.3" - periodo
+				// Elemento "1.3" - el periodo de tiempo que va a estar activo el consentimiento (fecha inicial como la del momento de la creación y la final que viene del QuestionnaireResponse)
 				if (qrItemComponent.getLinkId().equals("1.3")){
 					String[] end = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue().split("-");
 					
@@ -103,7 +105,8 @@ public class QuestionnaireResponseToConsent {
 					
 				}
 	
-				// Elemento "1.3" - periodo
+				// Elemento "1.3" - el periodo de tiempo que va a estar activo el consentimiento (fecha inicial y final, ambas del QuestionnaireResponse)
+				// No es la implementación que hay en la actualidad, depende del formulario HTML que se utilice para recoger esta información, puesto que permitirá almacenar una u otra cosa.
 				//if (qrItemComponent.getLinkId().equals("1.3~date")){
 				//	String aux = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue();
 				//	String[] start = aux.split(";")[0].split("-");
@@ -120,7 +123,7 @@ public class QuestionnaireResponseToConsent {
 				//	
 				//}
 
-				// Elemento "1.4"
+				// Elemento "1.4" - Facultativo que va a obtener el consentimiento
 				if (qrItemComponent.getLinkId().equals("1.4")){
 					
 					consent.setGrantee(new ArrayList<Reference>(){{
@@ -128,7 +131,7 @@ public class QuestionnaireResponseToConsent {
 					}});
 				}
 	
-				// Elemento "1.5"
+				// Elemento "1.5" - uso que se le va a dar a la información a la que se consigue acceso
 				if (qrItemComponent.getLinkId().equals("1.5")){
 					
 					String[] codeList = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue().split(";");
@@ -139,11 +142,11 @@ public class QuestionnaireResponseToConsent {
 	
 				}
 	
-				//TODO elmento del cuestionario 2.1~date
+				//TODO elmento del cuestionario "2.1~date" - periodo temporal del que se necesita la información
 	
-				//TODO elemento del cuestionario 2.2~string
+				//TODO elemento del cuestionario "2.2~string" - campo opcional que indica el tipo de información al que se da acceso
 	
-				// Elemento "2.3~select"
+				// Elemento "2.3~select" - campo opcional que indica el tipo de recurso Fhir que se solicita
 				if (qrItemComponent.getLinkId().equals("2.3")){
 					
 					String[] codeList = qrItemComponent.getAnswerFirstRep().getValueStringType().getValue().split(";");
@@ -154,7 +157,7 @@ public class QuestionnaireResponseToConsent {
 	
 				}
 	
-				// Elemento "2.4~string"
+				// Elemento "2.4~string" - campo opcional que indica el identificador específico del recurso
 				if (qrItemComponent.getLinkId().equals("2.4")){
 	
 					provision.addData(

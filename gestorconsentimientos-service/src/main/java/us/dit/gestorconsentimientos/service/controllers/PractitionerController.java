@@ -20,6 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import us.dit.gestorconsentimientos.model.RequestedConsent;
 import us.dit.gestorconsentimientos.model.ReviewedConsent;
@@ -28,6 +30,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
 import us.dit.gestorconsentimientos.service.services.kie.KieConsentService;
 import us.dit.gestorconsentimientos.service.services.kie.process.ConsentRequestProcessService;
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
+import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToViewForm;
 
 /**
  * Controlador que va a atender las operaciones que van destinadas a los recursos que
@@ -36,6 +39,7 @@ import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireRe
  * @author Javier
  */
 @Controller
+@RequestMapping("/facultativo")
 public class PractitionerController {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -55,7 +59,7 @@ public class PractitionerController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "practitioner-menu" plantilla thymeleaf
      */
-    @GetMapping("/facultativo")
+    @GetMapping
     public String getPractitionerMenu(Model model) {
 
         logger.info("IN --- /facultativo");
@@ -80,12 +84,16 @@ public class PractitionerController {
      * <br><br>
      * En cuanto a JBPM, va a instanciar el proceso de solicitud de consentimientos, y va a obtener el
      * cuestionario que el facultativo tiene que responder para crear la solicitud de consentimiento (tarea manual).
+     * <br><br>
+     * Los parámetros que trae el WI de la tarea humana que se inicia son: 
+     * + fhirServer
+     * + requestQuestionnaireId
      * 
      * @param httpSession contiene los atributos de la sesión http
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "practitioner-request-questionnarie" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/solicitar")
+    @GetMapping("/solicitar")
     //@ResponseBody
     public String getPractitionerRequestQuestionnarie(HttpSession httpSession, Model model) {
         
@@ -138,12 +146,16 @@ public class PractitionerController {
      * <br><br>
      * En cuanto a JBPM, va a finalizar la tarea manual, lo que provoca la creación de procesos de revisión
      * de consentimiento para cada uno de los pacientes a los que va dirigida la solicitud.
+     * <br><br>
+     * Los parámetros de salida del WI de la tarea humana que completa son: 
+     * + requestQuestionnaireResponseId
+     * + patientList
      * 
      * @param httpSession contiene los atributos de la sesión http
      * @param request representa la petición HTTP recibida, y contiene la información de esta
      * @return 
      */    
-    @PostMapping("/facultativo/solicitud")
+    @PostMapping("/solicitud")
     public String postPractitionerRequest(HttpSession httpSession, HttpServletRequest request) {
 
         logger.info("IN --- POST /facultativo/solicitud");
@@ -155,16 +167,16 @@ public class PractitionerController {
         MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( requestQuestionnarie);
         Map<String, String[]> formResponse = null; 
         List<String> patientList = null;
-        FhirDTO qestionnaireResponse = null;
+        FhirDTO questionnaireResponse = null;
         Long requestQuestionnarieResponseId = null;
         Map <String,Object> results = new HashMap<String,Object>();
         
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         formResponse = request.getParameterMap();
         patientList = Arrays.asList(formResponse.get("patients")[0].split(";"));
-        qestionnaireResponse = mapToQuestionnaireResponseMapper.map(formResponse);
-        qestionnaireResponse.setServer(fhirServer);
-        requestQuestionnarieResponseId = fhirDAO.save(qestionnaireResponse);
+        questionnaireResponse = mapToQuestionnaireResponseMapper.map(formResponse);
+        questionnaireResponse.setServer(fhirServer);
+        requestQuestionnarieResponseId = fhirDAO.save(questionnaireResponse);
 
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
@@ -175,7 +187,7 @@ public class PractitionerController {
         
         logger.info("OUT --- POST /facultativo/solicitud");
         
-        return "redirect:/facultativo/solicitudes/"+processInstanceId.toString();
+        return "redirect:/facultativo/solicitudes/";
     }
      
     /**
@@ -186,7 +198,7 @@ public class PractitionerController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "practitioner-request-list" plantilla thymeleaf
      */        
-    @GetMapping("/facultativo/solicitudes")
+    @GetMapping("/solicitudes")
     public String getPractitionerRequests(Model model) {
 
         logger.info("IN --- /facultativo/solicitudes");
@@ -214,22 +226,43 @@ public class PractitionerController {
     }
 
     /**
-     * Controlador que gestiona las operaciones GET al recurso "/facultativo/solicitud".
+     * Controlador que gestiona las operaciones GET al recurso "/facultativo/solicitudes/{id}".
      * Genera contenido web que muestra en detalle la solicitud de consentimiento solicitada.
      * 
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada la solicitud de consentimiento
      * @return "practitioner-request-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/solicitudes/{id}")
-    public String getPractitionerRequestById(Model model, @PathVariable Long id) {
+    @GetMapping("/solicitudes/{id}")
+    @ResponseBody
+    public String getPractitionerRequestById(HttpSession httpSession, @PathVariable Long id) {
         
-        logger.info("IN --- /facultativo/solicitud");
+        logger.info("IN --- /facultativo/solicitudes/"+Long.toString(id));
+        
+        RequestedConsent requestedConsent = null;
+        Long questionnaireResponseId = null;
+        FhirDTO questionnaireResponse = null;
+        String fhirServer = (String) httpSession.getAttribute("fhirServer");
+        QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
+        String result = null;
 
+        // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
+        requestedConsent = kieConsentService.getRequestedConsentByConsentReviewInstanceId(id);
+
+        if (requestedConsent != null){
+            questionnaireResponseId = requestedConsent.getRequestQuestionnaireResponseId();
+            questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", questionnaireResponseId);
+        
+            result = questionnaireResponseToViewForm.map(questionnaireResponse);
+        }else{
+            // TODO Poner plantilla de error cuando se implemente la plantilla para la respuesta correcta en lugar de utilizar el mapper
+            result = "ERROR";
+        }
+        
+        logger.info("OUT --- /facultativo/solicitudes/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre una solicitud de consentimiento, a partir de un recurso FHIR de tipo QuestionnaireResponse
-
-        logger.info("OUT --- /facultativo/solicitud");
-        return "practitioner-request-individual";
+        // return "practitioner-request-individual";
+        return result;
     }
 
     /**
@@ -240,7 +273,7 @@ public class PractitionerController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "practitioner-consent-list" plantilla thymeleaf
      */ 
-    @GetMapping("/facultativo/consentimientos")
+    @GetMapping("/consentimientos")
     public String getPractitionerConsents(Model model) {
 
         logger.info("IN --- /facultativo/consentimientos");
@@ -268,7 +301,7 @@ public class PractitionerController {
     }
 
     /**
-     * Controlador que gestiona las operaciones GET al recurso "/facultativo/consentimiento".
+     * Controlador que gestiona las operaciones GET al recurso "/facultativo/consentimientos/{id}".
      * Genera contenido web que muestra en detalle un consentimiento otorgado por un 
      * paciente, que puede ser aceptados o rechazados.
      * 
@@ -276,14 +309,43 @@ public class PractitionerController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "practitioner-consent-individual" plantilla thymeleaf
      */
-    @GetMapping("/facultativo/consentimientos/{id}")
-    public String getPractitionerConsentById(Model model, @PathVariable Long id) {
+    @GetMapping("/consentimientos/{id}")
+    @ResponseBody
+    public String getPractitionerConsentById(HttpSession httpSession, @PathVariable Long id) {
 
-        logger.info("IN --- /facultativo/consentimiento");
+        logger.info("IN --- /facultativo/consentimientos/"+Long.toString(id));
+        
+        //TODO Hay que hacer el cambio en RequestedConsent (definición de proceso, y de la entidad del modelo de datos) y añadir el id del recurso Fhir Consent, y dejar de utilizar por tanto QuestionnaireResponse para representar Consent (aunque se siga manteniendo)
+
+        ReviewedConsent reviewedConsent = null;
+        Long questionnaireResponseId = null;
+        FhirDTO questionnaireResponse = null;
+        String fhirServer = (String) httpSession.getAttribute("fhirServer");
+        QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
+        String result = null;
+
+        // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
+        reviewedConsent = kieConsentService.getReviewedConsentByConsentReviewInstanceId(id);
+
+        if (reviewedConsent != null){
+            questionnaireResponseId = reviewedConsent.getRequestQuestionnaireResponseId();
+            questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", questionnaireResponseId);
+        
+            result = questionnaireResponseToViewForm.map(questionnaireResponse);
+        }else{
+            // TODO Poner plantilla de error cuando se implemente la plantilla para la respuesta correcta en lugar de utilizar el mapper
+            result = "ERROR";
+        }
+
+        
+        logger.info("OUT --- /paciente/consentimientos/"+Long.toString(id));
+        //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent        
+        
+        logger.info("OUT --- /facultativo/consentimientos/"+Long.toString(id));
         
         //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent
+        //return "practitioner-consent-individual";
 
-        logger.info("OUT --- /facultativo/consentimiento");
-        return "practitioner-consent-individual";
+        return result;
     }
 }

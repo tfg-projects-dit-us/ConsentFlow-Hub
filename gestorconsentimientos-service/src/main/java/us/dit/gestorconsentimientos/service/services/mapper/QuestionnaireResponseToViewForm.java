@@ -2,14 +2,15 @@ package us.dit.gestorconsentimientos.service.services.mapper;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemAnswerOptionComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
+import us.dit.gestorconsentimientos.service.model.FhirDAO;
+import us.dit.gestorconsentimientos.service.model.FhirDTO;
 
 
 /**
@@ -21,28 +22,25 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 @Service
 public class QuestionnaireResponseToViewForm{
 
-	
-	private FhirContext ctx = FhirContext.forR5();
+	private static final Logger logger = LogManager.getLogger();
 
-	@Value("${fhirserver.location}")
+	private static FhirDAO fhirDAO = new FhirDAO();
+
 	private String fhirServer;
 
-	private IGenericClient client;
-	
-	private String patients;
-	
-	public String map(String questionnaireResponseId, String patients) {
-		// Obtenemos el QuestionnaireResponse a partir de su id
+	public String map(FhirDTO questionnaireResponseDTO) {
+				
+		logger.info("Mapeo de QuestionnaireResponse a HTML");		
 		
-		this.patients = patients;
-		client = ctx.newRestfulGenericClient(fhirServer);
-		QuestionnaireResponse questionnaireResponse = client.read().resource(QuestionnaireResponse.class).withId(questionnaireResponseId).execute();
+		QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) questionnaireResponseDTO.getResource();
 		
+		fhirServer = questionnaireResponseDTO.getServer();
+
 		String contentHtml = generateHtml(questionnaireResponse);
 		
 		return contentHtml;
 	}
-	
+
 	private String generateHtml(QuestionnaireResponse questionnaireResponse) {
 		String html = "<!DOCTYPE html>\r\n"
 				+ "<html>\r\n";
@@ -75,12 +73,12 @@ public class QuestionnaireResponseToViewForm{
 		String body = null;
 		
 		body = "<body>\r\n"
-				+ "<a class=\"home-link\" href=\"/private/practitioner/consentsRequested/\">Back</a>\r\n"
+				+ "<a class=\"home-link\" href=\"/facultativo/solicitudes/\">Back</a>\r\n"
 				+"<div class=\"box\">\r\n"
 				+ "<h2>Meta-Questionnaire</h2>\r\n"
 				+ "<form>\r\n";
 		
-		Questionnaire metaQuestionnaire = client.read().resource(Questionnaire.class).withUrl(questionnaireResponse.getQuestionnaire()).execute();
+		Questionnaire metaQuestionnaire = (Questionnaire) fhirDAO.get(fhirServer,questionnaireResponse.getQuestionnaire()).getResource();
 		
 		for (Questionnaire.QuestionnaireItemComponent item : metaQuestionnaire.getItem()) {
 			QuestionnaireResponse.QuestionnaireResponseItemComponent it = null;
@@ -169,19 +167,14 @@ public class QuestionnaireResponseToViewForm{
 		
 		String component = null;
 		
-		if (item.getLinkId().equals("1.2")) {
+		if (itemResponse != null) {
+			String value = itemResponse.getAnswer().get(0).getValue().toString();
+		
 			component = "<label for=\"" + id + "\">" + question + "</label>\r\n"
-					+ "<input type=\"text\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + patients + "\" readonly>\r\n";
+				+ "<input type=\"text\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + value + "\" readonly>\r\n";
 		} else {
-			if (itemResponse != null) {
-				String value = itemResponse.getAnswer().get(0).getValue().toString();
-			
-				component = "<label for=\"" + id + "\">" + question + "</label>\r\n"
-					+ "<input type=\"text\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + value + "\" readonly>\r\n";
-			} else {
-				component = "<label for=\"" + id + "\">" + question + "</label>\r\n"
-						+ "<input type=\"text\" id=\"" + id + "\" name=\"" + id + "\" readonly>\r\n";
-			}
+			component = "<label for=\"" + id + "\">" + question + "</label>\r\n"
+					+ "<input type=\"text\" id=\"" + id + "\" name=\"" + id + "\" readonly>\r\n";
 		}
 		
 		return component;
@@ -195,16 +188,11 @@ public class QuestionnaireResponseToViewForm{
 		
 		if (itemResponse != null) {
 			String value = itemResponse.getAnswer().get(0).getValue().toString();
-			String[] dates = value.split(";");
 		
 			component = "<label for=\"" + id + "\">" + question + "</label>\r\n"
 					+ "<div>\r\n"
-					+ "<span>Start:</span>\r\n"
-					+ "<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + dates[0] + "\" readonly>\r\n"
-					+ "</div>\r\n"
-					+ "<div>\r\n"
 					+ "<span>End:</span>\r\n"
-					+ "<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + dates[1] + "\" readonly>\r\n"
+					+ "<input type=\"date\" id=\"" + id + "\" name=\"" + id + "\" value=\"" + value + "\" readonly>\r\n"
 					+ "</div>\r\n";
 		} else {
 			component = "<label for=\"" + id + "\">" + question + "</label>\r\n"

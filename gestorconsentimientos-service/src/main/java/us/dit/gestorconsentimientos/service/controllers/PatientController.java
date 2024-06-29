@@ -26,11 +26,13 @@ import us.dit.gestorconsentimientos.service.services.kie.process.ConsentReviewPr
 import us.dit.gestorconsentimientos.service.services.mapper.MapToQuestionnaireResponse;
 import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToConsent;
 import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToQuestionnaire;
+import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireResponseToViewForm;
 import us.dit.gestorconsentimientos.service.services.mapper.QuestionnaireToFormPatient;
 import us.dit.gestorconsentimientos.model.RequestedConsent;
 import us.dit.gestorconsentimientos.model.ReviewedConsent;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 
 /**
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  * @author Javier
  */
 @Controller
+@RequestMapping("/paciente")
 public class PatientController {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -67,7 +70,7 @@ public class PatientController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "patient-menu" plantilla thymeleaf
      */
-    @GetMapping("/paciente")
+    @GetMapping
     public String getPatientMenu(Model model) {
 
         logger.info("IN /paciente");
@@ -93,7 +96,7 @@ public class PatientController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "patient-request-list" plantilla thymeleaf
      */
-    @GetMapping("/paciente/solicitudes")
+    @GetMapping("/solicitudes")
     public String getPatientRequests(Model model) {
         
         logger.info("IN --- /paciente/solicitudes");
@@ -124,16 +127,20 @@ public class PatientController {
      * Controlador que gestiona las operaciones GET al recurso "/paciente/solicitud".
      * Genera contenido web que muestra un formulario para revisar la solicitud de
      * consentimiento, y otorgarlo o rechazarlo.
+     * <br><br>
+     * Los parámetros que trae el WI de la tarea humana que se inicia son: 
+     * + fhirServer
+     * + requestQuestionnaireResponseId
      * 
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "patient-request-individual" plantilla thymeleaf
      */
-    @GetMapping("/paciente/solicitudes/{id}")
+    @GetMapping("/solicitudes/{id}")
     @ResponseBody
     public String getPatientRequestById(HttpSession httpSession, @PathVariable Long id) {
-        //http://localhost:8090/paciente/solicitud/2
-        logger.info("IN --- /paciente/solicitud");
+        //http://localhost:8090/paciente/solicitudes/2
+        logger.info("IN --- /paciente/solicitudes/"+Long.toString(id));
         
         // El ID de la isntancia del proceso que corresponde a la solicitud de consentimiento
         // a rellenar es el ID utilizado para identificar la tarea de revisión para el 
@@ -165,7 +172,7 @@ public class PatientController {
 
         reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
 
-        logger.info("OUT --- /paciente/solicitud");
+        logger.info("OUT --- /paciente/solicitudes/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre un formulario para aceptar o rechazar un una solicitud de consentimiento, que será necesario mostrar, a partir de un recurso FHIR de tipo QuestionnaireResponse
         //return "patient-request-individual";
         return reviewQuestionnarieForm;
@@ -174,15 +181,20 @@ public class PatientController {
     /**
      * Controlador que gestiona las operaciones POST al recurso "/paciente/consentimiento".
      * Muestra el consentimiento generado.
+     * <br><br>
+     * Los parámetros de salida de la tarea humana que se completa son: 
+     * + reviewQuestionnaireId
+     * + reviewQuestionnaireResponseId
+     * + review
      * 
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @param request representa la petición HTTP recibida, y contiene la información de esta
      * @return
      */ 
-    @PostMapping("/paciente/consentimiento")
+    @PostMapping("/consentimiento")
     public String postPatientConsent(HttpSession httpSession, HttpServletRequest request) {
         
-        logger.info("IN --- POST /paciente/solicitud");
+        logger.info("IN --- POST /paciente/consentimiento");
 
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
         Long reviewQuestionnaireId = (Long) httpSession.getAttribute("reviewQuestionnaireId");
@@ -201,7 +213,8 @@ public class PatientController {
         
 		// Obtenemos los campos rellenados del Meta-Cuestionario en un Map
 		reviewQuestionnaireFormResponse = request.getParameterMap();
-        String[] value_review = reviewQuestionnaireFormResponse.get("3");
+        String[] value_review = reviewQuestionnaireFormResponse.get("3");// Identificador del campo de la respuesta del formulario HTML utilizado para aceptar el consentimiento
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value_review.length; i++) {
             sb.append(value_review[i]);
@@ -229,12 +242,12 @@ public class PatientController {
             results.put("reviewQuestionnaireResponseId",reviewQuestionnaireResponseId);
             results.put("review",review);
             consentReviewProcessService.completeReviewTask(processInstanceId, results);
-            redirect = "redirect:/paciente/consentimientos/"+processInstanceId.toString();
+            redirect = "redirect:/paciente/consentimientos/";
         }else{
             logger.info("La solicitud de consentimiento ha sido rechazada");
         }
 
-        logger.info("OUT --- POST /paciente/solicitud");
+        logger.info("OUT --- POST /paciente/consentimiento");
         return redirect;
     }
 
@@ -246,7 +259,7 @@ public class PatientController {
      * @param model contendrá los atributos que necesita la plantilla thymeleaf
      * @return "patient-consent-list" plantilla thymeleaf
      */ 
-    @GetMapping("/paciente/consentimientos")
+    @GetMapping("/consentimientos")
     public String getPatientConsents(Model model) {
         
         logger.info("IN --- /paciente/consentimientos");
@@ -281,15 +294,40 @@ public class PatientController {
      * @param id identifica la instancia de proceso "ConsentReview" que tiene asociada el consentimiento
      * @return "patient-consent-individual" plantilla thymeleaf
      */    
-    @GetMapping("/paciente/consentimientos/{id}")
-    public String getPatientConsentById(Model model, @PathVariable Long id) {
+    @GetMapping("/consentimientos/{id}")
+    @ResponseBody
+    public String getPatientConsentById(HttpSession httpSession, @PathVariable Long id) {
 
-        logger.info("IN --- /paciente/consentimiento");
+        logger.info("IN --- /paciente/consentimientos/"+Long.toString(id));
 
+        //TODO Hay que hacer el cambio en RequestedConsent (definición de proceso, y de la entidad del modelo de datos) y añadir el id del recurso Fhir Consent, y dejar de utilizar por tanto QuestionnaireResponse para representar Consent (aunque se siga manteniendo)
+
+        ReviewedConsent reviewedConsent = null;
+        Long questionnaireResponseId = null;
+        FhirDTO questionnaireResponse = null;
+        String fhirServer = (String) httpSession.getAttribute("fhirServer");
+        QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
+        String result = null;
+
+        // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
+        reviewedConsent = kieConsentService.getReviewedConsentByConsentReviewInstanceId(id);
+
+        if (reviewedConsent != null){
+            questionnaireResponseId = reviewedConsent.getRequestQuestionnaireResponseId();
+            questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", questionnaireResponseId);
+        
+            result = questionnaireResponseToViewForm.map(questionnaireResponse);
+        }else{
+            // TODO Poner plantilla de error cuando se implemente la plantilla para la respuesta correcta en lugar de utilizar el mapper
+            result = "ERROR";
+        }
+
+        
+        logger.info("OUT --- /paciente/consentimientos/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent
+        //return "patient-consent-individual" ;
 
-        logger.info("OUT --- /paciente/consentimiento");
-        return "patient-consent-individual" ;
+        return result;
     }
 
 }

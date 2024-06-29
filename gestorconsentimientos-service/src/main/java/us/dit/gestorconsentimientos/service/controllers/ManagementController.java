@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -19,6 +20,7 @@ import us.dit.gestorconsentimientos.service.services.kie.KieManagementService;
  */
 @Controller
 @ResponseBody
+@RequestMapping("/management")
 public class ManagementController {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -35,7 +37,7 @@ public class ManagementController {
      * 
      * @return "Texto"
      */    
-    @GetMapping("/management/deployedUnits")
+    @GetMapping("/deployedUnits")
     public String getDeployedUnits() {
         // http://localhost:8090/management/deployedUnits
         logger.info("IN --- /management/deployedUnits");
@@ -55,7 +57,7 @@ public class ManagementController {
      * @param detailed Bandera que indica si se detallan o no las instancias de proceso
      * @return "Texto"
      */    
-    @GetMapping("/management/processInstances")
+    @GetMapping("/processInstances")
     public String getProcessInstances(@RequestParam boolean detailed) {
         // http://localhost:8090/management/processInstances?detailed=true
         logger.info("IN --- /management/processInstances");
@@ -75,7 +77,7 @@ public class ManagementController {
      * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
      * @return "Texto"
      */    
-    @GetMapping("/management/workItems")
+    @GetMapping("/workItems")
     public String getWorkItemsByProcessInstanceId(@RequestParam Long processInstanceId) {
         
         logger.info("IN --- /management/workItems");
@@ -95,7 +97,7 @@ public class ManagementController {
      * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
      * @return "Texto"
      */    
-    @GetMapping("/management/tasks")
+    @GetMapping("/tasks")
     public String getTasksByProcessInstanceId(@RequestParam Long processInstanceId) {
         
         logger.info("IN --- /management/tasks");
@@ -115,7 +117,7 @@ public class ManagementController {
      * @param processInstanceId Bandera que indica si se detallan o no las instancias de proceso
      * @return "Texto"
      */    
-    @GetMapping("/management/vars")
+    @GetMapping("/vars")
     public String getVarssByProcessInstanceId(@RequestParam Long processInstanceId) {
         
         logger.info("IN --- /management/vars");

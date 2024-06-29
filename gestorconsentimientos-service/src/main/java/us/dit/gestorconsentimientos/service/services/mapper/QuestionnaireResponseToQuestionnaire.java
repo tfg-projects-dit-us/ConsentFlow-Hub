@@ -55,6 +55,8 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<FhirDTO, Fh
 		Questionnaire metaQuestionnaire = client.read().resource(Questionnaire.class).withUrl(response.getQuestionnaire()).execute();
 		
 		for (QuestionnaireResponse.QuestionnaireResponseItemComponent item : response.getItem().get(0).getItem()) {
+			
+			// Este linkId identifica al título del cuestionario
 			if (item.getLinkId().equals("1.1")) {
 				questionnaire.setTitle(item.getAnswer().get(0).getValue().toString());
 			}

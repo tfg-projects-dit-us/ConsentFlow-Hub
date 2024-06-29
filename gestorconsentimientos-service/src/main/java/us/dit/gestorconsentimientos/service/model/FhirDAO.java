@@ -1,5 +1,7 @@
 package us.dit.gestorconsentimientos.service.model;
 
+import org.hl7.fhir.r5.model.Questionnaire;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -30,6 +32,25 @@ public class FhirDAO {
 		client = ctx.newRestfulGenericClient(server);       
 
         return new FhirDTO(server,client.read().resource(resourceType).withId(id).execute());
+    }
+
+    /**
+     * Método para obtener un recruso FHIR de un servidor, a partir de su ID.
+     * 
+     * @param server servidor fhir en el que se encuentra el recurso FHIR
+     * @param resourceType tipo de recurso FHIR que se maneja
+     * @param id identificador del recurso FHIR a obtener
+     * @return DTO del recurso fhir que se obtiene
+     */
+    public FhirDTO get(String server,String url) {
+
+        FhirContext ctx = null;
+		IGenericClient client = null;
+
+		ctx = FhirContext.forR5();
+		client = ctx.newRestfulGenericClient(server);     
+
+        return new FhirDTO(server,client.read().resource(Questionnaire.class).withUrl(url).execute());
     }
 
 

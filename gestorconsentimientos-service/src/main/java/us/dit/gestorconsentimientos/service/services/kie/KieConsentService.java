@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.common.protocol.types.Field.Bool;
 import org.jbpm.services.api.AdvanceRuntimeDataService;
+import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.model.QueryParam;
@@ -33,7 +35,10 @@ public class KieConsentService {
     
     @Autowired
 	private AdvanceRuntimeDataService advancedRuntimeDataService;   
-
+    
+    @Autowired
+	private RuntimeDataService runtimeDataService;
+    
     @Value("${kie.task.ConsentReviewGeneration.name}")
     private String reviewHumanTaskName;
 
@@ -48,6 +53,79 @@ public class KieConsentService {
 
     @Value("${spring.datasource.url}")
     private String dataSource;
+
+    public RequestedConsent getRequestedConsentByConsentReviewInstanceId(Long processInstanceId){
+        
+        List<ProcessInstanceWithVarsDesc> processInstanceDescList = null;
+        ProcessInstanceWithVarsDesc processInstanceDesc = null;
+        Map<String,Object> processInstanceVars = null;
+        RequestedConsent requestedConsent = null;
+
+        processInstanceDescList = advancedRuntimeDataService.queryProcessByVariables(
+            new ArrayList<QueryParam>(){{ 
+                    add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
+                    add(QueryParam.equalsTo(QueryResultMapper.COLUMN_PROCESSINSTANCEID, Long.toString(processInstanceId)));
+                    }},
+            null,
+            new QueryContext());
+        
+        if (processInstanceDescList.size() != 0) {
+            
+            processInstanceDesc = processInstanceDescList.get(0);
+            
+            processInstanceVars = processInstanceDesc.getVariables();
+    
+            requestedConsent = new RequestedConsent(
+                (Long) processInstanceDesc.getId(),
+                (String) processInstanceVars.get("fhirServer"),
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Date) processInstanceDesc.getDataTimeStamp(),
+                (String) processInstanceVars.get("practitioner"), 
+                (String) processInstanceVars.get("patient"));
+        }
+        
+        return requestedConsent;
+    }
+
+
+    public ReviewedConsent getReviewedConsentByConsentReviewInstanceId(Long processInstanceId){
+        
+        List<ProcessInstanceWithVarsDesc> processInstanceDescList = null;
+        ProcessInstanceWithVarsDesc processInstanceDesc = null;
+        Map<String,Object> processInstanceVars = null;
+        ReviewedConsent reviewedConsent = null;
+
+        processInstanceDescList = advancedRuntimeDataService.queryProcessByVariables(
+            new ArrayList<QueryParam>(){{ 
+                    add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, processConsentReviewId));
+                    add(QueryParam.equalsTo(QueryResultMapper.COLUMN_PROCESSINSTANCEID, Long.toString(processInstanceId)));
+                    }},
+            null,
+            new QueryContext());
+        
+        if (processInstanceDescList.size() != 0) {
+            
+            processInstanceDesc = processInstanceDescList.get(0);
+            
+            processInstanceVars = processInstanceDesc.getVariables();
+    
+            reviewedConsent = new ReviewedConsent(
+                (Long) processInstanceDesc.getId(),
+                (String) processInstanceVars.get("fhirServer"),
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireId")), 
+                (Long) Long.parseLong( (String) processInstanceVars.get("requestQuestionnaireResponseId")), 
+                (Date) processInstanceDesc.getDataTimeStamp(),
+                (String) processInstanceVars.get("practitioner"), 
+                (String) processInstanceVars.get("patient"),
+                (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")),
+                (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
+                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")));
+        }
+        
+        return reviewedConsent;
+    }    
+
 
     /**
      * Método que devuelve una lista con las solicitudes de consentimiento, pendientes 
@@ -84,7 +162,7 @@ public class KieConsentService {
         // Obtención de las variables que forman parte de cada consentimiento
         for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
             
-            processInstanceVars = processInstanceDesc.getVariables();            
+            processInstanceVars = processInstanceDesc.getVariables();
             
             consentsList.add(new RequestedConsent(
                 (Long) processInstanceDesc.getId(),
@@ -140,7 +218,7 @@ public class KieConsentService {
                 (String) processInstanceVars.get("patient"), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                (Boolean) processInstanceVars.get("review")));
+                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review"))));
         }
 
         return consentsList;
@@ -283,7 +361,7 @@ public class KieConsentService {
                     (String) processInstanceVars.get("patient"), 
                     (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                     (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                    (Boolean) processInstanceVars.get("review")));
+                    (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review"))));
             }
         }
 
