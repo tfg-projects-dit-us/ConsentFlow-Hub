@@ -1,7 +1,10 @@
 package us.dit.gestorconsentimientos.service.services.kie.process;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,6 +12,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
@@ -67,18 +71,28 @@ public class ConsentRequestProcessService {
     private void deployBusinessAssests(){
 
         DeploymentUnit deploymentUnit = null;
+        Collection<DeployedUnit> deployedUnitList = null;
+        String GAV = deploymentGroupId + ":" + deploymentArtifactId + ":" + deploymentVersion;
         
-        if (this.deploymentService.getDeployedUnits().iterator().hasNext()){
+        // Obtención de una lista de unidades de despliegue disponibles     
+        deployedUnitList = this.deploymentService.getDeployedUnits();
         
+        // Filtrado de la lista de unidades de despliegue a aquellas que estén activas y que tengan como identificador GAV. 
+        // Se da por sentado que siempre se sigue este esquema para el nombrado de la unidad de despliegue.
+        deployedUnitList = deployedUnitList.stream().filter(
+            deployedUnit->(deployedUnit.isActive() && deployedUnit.getDeploymentUnit().getIdentifier().equals(GAV))).collect(Collectors.toList());
+        
+        
+        if (deployedUnitList.iterator().hasNext()){
+            // En caso de haber alguna que cumpla el filtrado anterior, se obtiene su ID y se fija.
             deploymentUnitId = this.deploymentService.getDeployedUnits().iterator().next().getDeploymentUnit().getIdentifier();
 
-            //FIXME Modificar la comprobación para ver si existe una Unidad de Despliegue que tenga como identificador el que tenga el mismo Grupo/Id/Versión dandose por sentado que siempre se sigue la misma convención de nombrado.
-
             //TODO ¿Se crean más unidades de despliegue? ¿Es la forma correcta de utilizar siempre la misma?
-
             //TODO Tratar de averiguar si se crea una unidad de despliegue al iniciarse la aplicación, sin necesidad de crearla
             
         }else{
+            // En caso de no haber ninguna unidad de despliegue con el identificador GAV y que esté activa se crea una.
+            
             // Cración de la unidad de despliegue que contiene todos los activos de negocio
             deploymentUnit = new KModuleDeploymentUnit(deploymentGroupId, deploymentArtifactId, deploymentVersion);
             deploymentUnitId = deploymentUnit.getIdentifier();
@@ -132,6 +146,7 @@ public class ConsentRequestProcessService {
         String fhirServer = null;
         Long requestQuestionnaireId = null;
         Map <String, Object> vars = new HashMap<String,Object>();
+        List<WorkItem> workItemInstanceList = null;
         WorkItem workItemInstance = null;
         UserTaskInstanceDesc userTaskInstanceDesc = null;
 
@@ -148,11 +163,13 @@ public class ConsentRequestProcessService {
         vars.put("requestQuestionnaireId",requestQuestionnaireId);
 
         
-        // FIXME Se podría recoger la lista y obtener únicamente el work Item que corresponda con el ID o nombre de la tarea
         // La instancia de Work Item que se está obteniendo es la primera de las múltiples posibles tareas
         // activas que puede haber en el proceso, por cómo está diseñado, solo puede haber una única tarea
-        // o nodo activo de manera simultánea, y por tanto un solo WI en esa lista.
-        workItemInstance = processService.getWorkItemByProcessInstance(processInstanceId).get(0);
+        // o nodo activo de manera simultánea, y por tanto un solo WI en esa lista. Además se comprueba que 
+        // esos WI pertenezcan a la tarea 'ConsentRequestGeneration'
+
+        workItemInstanceList = processService.getWorkItemByProcessInstance(processInstanceId);
+        workItemInstance = workItemInstanceList.stream().filter(wi->wi.getParameter("TaskName").equals("ConsentRequestGeneration")).collect(Collectors.toList()).get(0);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
 
         // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
@@ -161,7 +178,8 @@ public class ConsentRequestProcessService {
         // a ejecutar.
         
         // FIXME Buscar si es posible definir el proceso de forma que la tarea quede asignada a un rol, y que cualquier usuario que tenga ese rol pueda trabajar en ella, sin ser necesario modificar el propietario de la tarea.
-        
+        // TODO Investigar si el uso de la opción de arranque -Dorg.kie.server.bypass.auth.user=true podría hacer que cualquier usuario tenga permisos sobre cualquier tarea, sin tener que delegar, y sin tener que asignar usuarios a las tareas.
+
         // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
         // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
         // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va a ejecutar.

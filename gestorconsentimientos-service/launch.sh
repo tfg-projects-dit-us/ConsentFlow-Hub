@@ -76,5 +76,5 @@ else
 	files=( $pattern )
 	cd ${files[0]}
 	executable="$(ls  *target/*.jar | tail -n1)"
-	java -jar "$executable"
+	java -Dorg.kie.server.bypass.auth.user=true -jar "$executable"
 fi

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_YxEv8ArUEe-A-7LdcurIUQ" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd http://www.omg.org/spec/DD/20100524/DC DC.xsd http://www.omg.org/spec/DD/20100524/DI DI.xsd " exporter="jBPM Process Modeler" exporterVersion="2.0" targetNamespace="http://www.omg.org/bpmn20">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/bpmn20" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" id="_kaLZsDbJEe-0GY9zlYvFbA" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd http://www.omg.org/spec/DD/20100524/DC DC.xsd http://www.omg.org/spec/DD/20100524/DI DI.xsd " exporter="jBPM Process Modeler" exporterVersion="2.0" targetNamespace="http://www.omg.org/bpmn20">
   <bpmn2:itemDefinition id="_patientItem" structureRef="String"/>
   <bpmn2:itemDefinition id="_requestQuestionnaireResponseIdItem" structureRef="java.lang.Long"/>
   <bpmn2:itemDefinition id="_reviewQuestionnaireIdItem" structureRef="java.lang.Long"/>
@@ -43,7 +43,7 @@
       <bpmn2:incoming>_99777BEB-E80E-4E72-93A1-D2B298F96F2F</bpmn2:incoming>
     </bpmn2:endEvent>
     <bpmn2:userTask id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8" name="Consent Review Generation">
-      <bpmn2:documentation id="_YxEv8QrUEe-A-7LdcurIUQ"><![CDATA[Tarea en la que el paciente responde a un cuestionario para aceptar o rechazar la solicitud de consentimiento que ha recibido.]]></bpmn2:documentation>
+      <bpmn2:documentation id="_kaLZsTbJEe-0GY9zlYvFbA"><![CDATA[Tarea en la que el paciente responde a un cuestionario para aceptar o rechazar la solicitud de consentimiento que ha recibido.]]></bpmn2:documentation>
       <bpmn2:extensionElements>
         <drools:metaData name="elementname">
           <drools:metaValue><![CDATA[Consent Review Generation]]></drools:metaValue>
@@ -75,7 +75,7 @@ System.out.println("review: " + kcontext.getVariable("review"));]]></drools:scri
       </bpmn2:extensionElements>
       <bpmn2:incoming>_0343FBC1-EB27-48E7-8525-84E1B3F1349F</bpmn2:incoming>
       <bpmn2:outgoing>_99777BEB-E80E-4E72-93A1-D2B298F96F2F</bpmn2:outgoing>
-      <bpmn2:ioSpecification id="_YxEv8grUEe-A-7LdcurIUQ">
+      <bpmn2:ioSpecification id="_kaLZsjbJEe-0GY9zlYvFbA">
         <bpmn2:dataInput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputX" drools:dtype="Object" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputXItem" name="TaskName"/>
         <bpmn2:dataInput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_requestQuestionnaireResponseIdInputX" drools:dtype="java.lang.Long" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_requestQuestionnaireResponseIdInputXItem" name="requestQuestionnaireResponseId"/>
         <bpmn2:dataInput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_fhirServerInputX" drools:dtype="String" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_fhirServerInputXItem" name="fhirServer"/>
@@ -83,55 +83,55 @@ System.out.println("review: " + kcontext.getVariable("review"));]]></drools:scri
         <bpmn2:dataOutput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireIdOutputX" drools:dtype="java.lang.Long" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireIdOutputXItem" name="reviewQuestionnaireId"/>
         <bpmn2:dataOutput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireResponseIdOutputX" drools:dtype="java.lang.Long" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireResponseIdOutputXItem" name="reviewQuestionnaireResponseId"/>
         <bpmn2:dataOutput id="_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewOutputX" drools:dtype="Boolean" itemSubjectRef="__9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewOutputXItem" name="review"/>
-        <bpmn2:inputSet id="_YxEv8wrUEe-A-7LdcurIUQ">
+        <bpmn2:inputSet id="_kaLZszbJEe-0GY9zlYvFbA">
           <bpmn2:dataInputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_requestQuestionnaireResponseIdInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_fhirServerInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_SkippableInputX</bpmn2:dataInputRefs>
         </bpmn2:inputSet>
-        <bpmn2:outputSet id="_YxEv9ArUEe-A-7LdcurIUQ">
+        <bpmn2:outputSet id="_kaLZtDbJEe-0GY9zlYvFbA">
           <bpmn2:dataOutputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireIdOutputX</bpmn2:dataOutputRefs>
           <bpmn2:dataOutputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireResponseIdOutputX</bpmn2:dataOutputRefs>
           <bpmn2:dataOutputRefs>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewOutputX</bpmn2:dataOutputRefs>
         </bpmn2:outputSet>
       </bpmn2:ioSpecification>
-      <bpmn2:dataInputAssociation id="_YxEv9QrUEe-A-7LdcurIUQ">
+      <bpmn2:dataInputAssociation id="_kaLZtTbJEe-0GY9zlYvFbA">
         <bpmn2:targetRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputX</bpmn2:targetRef>
-        <bpmn2:assignment id="_YxEv9grUEe-A-7LdcurIUQ">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_YxEv9wrUEe-A-7LdcurIUQ"><![CDATA[ConsentReviewGeneration]]></bpmn2:from>
-          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_YxEv-ArUEe-A-7LdcurIUQ">_9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputX</bpmn2:to>
+        <bpmn2:assignment id="_kaLZtjbJEe-0GY9zlYvFbA">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_kaLZtzbJEe-0GY9zlYvFbA"><![CDATA[ConsentReviewGeneration]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_kaLZuDbJEe-0GY9zlYvFbA">_9EA11BB8-5627-485F-92ED-73A15DC16FA8_TaskNameInputX</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
-      <bpmn2:dataInputAssociation id="_YxEv-QrUEe-A-7LdcurIUQ">
+      <bpmn2:dataInputAssociation id="_kaLZuTbJEe-0GY9zlYvFbA">
         <bpmn2:sourceRef>requestQuestionnaireResponseId</bpmn2:sourceRef>
         <bpmn2:targetRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_requestQuestionnaireResponseIdInputX</bpmn2:targetRef>
       </bpmn2:dataInputAssociation>
-      <bpmn2:dataInputAssociation id="_YxEv-grUEe-A-7LdcurIUQ">
+      <bpmn2:dataInputAssociation id="_kaLZujbJEe-0GY9zlYvFbA">
         <bpmn2:sourceRef>fhirServer</bpmn2:sourceRef>
         <bpmn2:targetRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_fhirServerInputX</bpmn2:targetRef>
       </bpmn2:dataInputAssociation>
-      <bpmn2:dataInputAssociation id="_YxEv-wrUEe-A-7LdcurIUQ">
+      <bpmn2:dataInputAssociation id="_kaLZuzbJEe-0GY9zlYvFbA">
         <bpmn2:targetRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_SkippableInputX</bpmn2:targetRef>
-        <bpmn2:assignment id="_YxEv_ArUEe-A-7LdcurIUQ">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_YxEv_QrUEe-A-7LdcurIUQ"><![CDATA[false]]></bpmn2:from>
-          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_YxEv_grUEe-A-7LdcurIUQ">_9EA11BB8-5627-485F-92ED-73A15DC16FA8_SkippableInputX</bpmn2:to>
+        <bpmn2:assignment id="_kaLZvDbJEe-0GY9zlYvFbA">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_kaLZvTbJEe-0GY9zlYvFbA"><![CDATA[false]]></bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_kaLZvjbJEe-0GY9zlYvFbA">_9EA11BB8-5627-485F-92ED-73A15DC16FA8_SkippableInputX</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
-      <bpmn2:dataOutputAssociation id="_YxEv_wrUEe-A-7LdcurIUQ">
+      <bpmn2:dataOutputAssociation id="_kaMAwDbJEe-0GY9zlYvFbA">
         <bpmn2:sourceRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireIdOutputX</bpmn2:sourceRef>
         <bpmn2:targetRef>reviewQuestionnaireId</bpmn2:targetRef>
       </bpmn2:dataOutputAssociation>
-      <bpmn2:dataOutputAssociation id="_YxEwAArUEe-A-7LdcurIUQ">
+      <bpmn2:dataOutputAssociation id="_kaMAwTbJEe-0GY9zlYvFbA">
         <bpmn2:sourceRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewQuestionnaireResponseIdOutputX</bpmn2:sourceRef>
         <bpmn2:targetRef>reviewQuestionnaireResponseId</bpmn2:targetRef>
       </bpmn2:dataOutputAssociation>
-      <bpmn2:dataOutputAssociation id="_YxEwAQrUEe-A-7LdcurIUQ">
+      <bpmn2:dataOutputAssociation id="_kaMAwjbJEe-0GY9zlYvFbA">
         <bpmn2:sourceRef>_9EA11BB8-5627-485F-92ED-73A15DC16FA8_reviewOutputX</bpmn2:sourceRef>
         <bpmn2:targetRef>review</bpmn2:targetRef>
       </bpmn2:dataOutputAssociation>
-      <bpmn2:potentialOwner id="_4da64159-8691-4df9-bdc8-d466e30b4412">
-        <bpmn2:resourceAssignmentExpression id="_YxEwAgrUEe-A-7LdcurIUQ">
-          <bpmn2:formalExpression id="_YxEwAwrUEe-A-7LdcurIUQ">wbadmin</bpmn2:formalExpression>
+      <bpmn2:potentialOwner id="_632f9e8f-9cf8-41ee-b527-8a0037e2e958">
+        <bpmn2:resourceAssignmentExpression id="_kaMAwzbJEe-0GY9zlYvFbA">
+          <bpmn2:formalExpression id="_kaMAxDbJEe-0GY9zlYvFbA">wbadmin</bpmn2:formalExpression>
         </bpmn2:resourceAssignmentExpression>
       </bpmn2:potentialOwner>
     </bpmn2:userTask>
@@ -139,8 +139,8 @@ System.out.println("review: " + kcontext.getVariable("review"));]]></drools:scri
       <bpmn2:outgoing>_0343FBC1-EB27-48E7-8525-84E1B3F1349F</bpmn2:outgoing>
     </bpmn2:startEvent>
   </bpmn2:process>
-  <bpmndi:BPMNDiagram id="_YxEwBArUEe-A-7LdcurIUQ">
-    <bpmndi:BPMNPlane id="_YxEwBQrUEe-A-7LdcurIUQ" bpmnElement="gestorconsentimientos-kjar.ConsentReview">
+  <bpmndi:BPMNDiagram id="_kaMAxTbJEe-0GY9zlYvFbA">
+    <bpmndi:BPMNPlane id="_kaMAxjbJEe-0GY9zlYvFbA" bpmnElement="gestorconsentimientos-kjar.ConsentReview">
       <bpmndi:BPMNShape id="shape__057A6C8D-5D3E-48BB-A43B-510CD2EAB63B" bpmnElement="_057A6C8D-5D3E-48BB-A43B-510CD2EAB63B">
         <dc:Bounds height="56.0" width="56.0" x="291.0" y="226.0"/>
       </bpmndi:BPMNShape>
@@ -160,19 +160,19 @@ System.out.println("review: " + kcontext.getVariable("review"));]]></drools:scri
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-  <bpmn2:relationship id="_YxEwBgrUEe-A-7LdcurIUQ" type="BPSimData">
+  <bpmn2:relationship id="_kaMAxzbJEe-0GY9zlYvFbA" type="BPSimData">
     <bpmn2:extensionElements>
       <bpsim:BPSimData>
         <bpsim:Scenario xsi:type="bpsim:Scenario" id="default" name="Simulationscenario">
           <bpsim:ScenarioParameters xsi:type="bpsim:ScenarioParameters"/>
-          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_057A6C8D-5D3E-48BB-A43B-510CD2EAB63B" id="_YxEwBwrUEe-A-7LdcurIUQ">
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_057A6C8D-5D3E-48BB-A43B-510CD2EAB63B" id="_kaMAyDbJEe-0GY9zlYvFbA">
             <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
               <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
                 <bpsim:NormalDistribution mean="0.0" standardDeviation="0.0"/>
               </bpsim:ProcessingTime>
             </bpsim:TimeParameters>
           </bpsim:ElementParameters>
-          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_9EA11BB8-5627-485F-92ED-73A15DC16FA8" id="_YxEwCArUEe-A-7LdcurIUQ">
+          <bpsim:ElementParameters xsi:type="bpsim:ElementParameters" elementRef="_9EA11BB8-5627-485F-92ED-73A15DC16FA8" id="_kaMAyTbJEe-0GY9zlYvFbA">
             <bpsim:TimeParameters xsi:type="bpsim:TimeParameters">
               <bpsim:ProcessingTime xsi:type="bpsim:Parameter">
                 <bpsim:NormalDistribution mean="0.0" standardDeviation="0.0"/>
@@ -195,7 +195,7 @@ System.out.println("review: " + kcontext.getVariable("review"));]]></drools:scri
         </bpsim:Scenario>
       </bpsim:BPSimData>
     </bpmn2:extensionElements>
-    <bpmn2:source>_YxEv8ArUEe-A-7LdcurIUQ</bpmn2:source>
-    <bpmn2:target>_YxEv8ArUEe-A-7LdcurIUQ</bpmn2:target>
+    <bpmn2:source>_kaLZsDbJEe-0GY9zlYvFbA</bpmn2:source>
+    <bpmn2:target>_kaLZsDbJEe-0GY9zlYvFbA</bpmn2:target>
   </bpmn2:relationship>
 </bpmn2:definitions>
