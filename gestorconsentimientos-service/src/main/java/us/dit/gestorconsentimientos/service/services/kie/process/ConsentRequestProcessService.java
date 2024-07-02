@@ -86,7 +86,7 @@ public class ConsentRequestProcessService {
         if (deployedUnitList.iterator().hasNext()){
             // En caso de haber alguna que cumpla el filtrado anterior, se obtiene su ID y se fija.
             deploymentUnitId = this.deploymentService.getDeployedUnits().iterator().next().getDeploymentUnit().getIdentifier();
-
+            logger.info("> Localizada de despliegue unidad con ID: " + deploymentUnitId);
             //TODO ¿Se crean más unidades de despliegue? ¿Es la forma correcta de utilizar siempre la misma?
             //TODO Tratar de averiguar si se crea una unidad de despliegue al iniciarse la aplicación, sin necesidad de crearla
             
@@ -100,7 +100,7 @@ public class ConsentRequestProcessService {
             // Despliegue de la unidad de depligue que contiene todos los activos de negocio
             deploymentService.deploy(deploymentUnit);
             deploymentService.activate(deploymentUnitId);
-            logger.info("> Desplegada unidad con ID: " + deploymentUnitId);
+            logger.info("> Desplegada unidad de despliegue con ID: " + deploymentUnitId);
             //logger.info("¿Está desplegada la unidad con ID " +deploymentUnitId+ "?: " + deploymentService.isDeployed(deploymentUnitId));
             //Collection<DeployedUnit> deployedUnits = deploymentService.getDeployedUnits();
             //logger.info("Deployment Units: ");
@@ -121,6 +121,7 @@ public class ConsentRequestProcessService {
 
         // Despliegue de los activos de negocio
         deployBusinessAssests();
+
 
         // Instanciación del proceso
         processInstanceId = processService.startProcess(deploymentUnitId, processId, params);
