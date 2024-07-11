@@ -29,21 +29,5 @@
       </config-item>
     </configItems>
   </configuration>
-  <containers>
-    <container>
-      <containerId>us.dit:gestorconsentimientos-kjar:1.0</containerId>
-      <releaseId>
-        <groupId>us.dit</groupId>
-        <artifactId>gestorconsentimientos-kjar</artifactId>
-        <version>1.0</version>
-      </releaseId>
-      <status>STARTED</status>
-      <scanner>
-        <status>STOPPED</status>
-      </scanner>
-      <configItems/>
-      <messages/>
-      <containerAlias>gestorconsentimientos-kjar</containerAlias>
-    </container>
-  </containers>
+  <containers/>
 </kie-server-state>

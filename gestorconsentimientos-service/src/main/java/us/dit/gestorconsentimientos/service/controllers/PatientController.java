@@ -231,6 +231,8 @@ public class PatientController {
             reviewQuestionnaireResponse.setServer(fhirServer);
             reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
     
+            // TODO Integrar en el proceso de review la creación del recurso consent en una tarea personalizada automática, para que lo haga un WorkItemHandler, y el resultado quede en el motor de procesos, como una variable más, y se pueda obtener junto con el resto de información
+            // TODO Modificar la clase del modelo que representa a un consentimiento para que cuente con el recurso consent
             // Generación de un recurso Consent
             FhirDTO consent = qrToConsent.map(fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId));
             consent.setServer(fhirServer);

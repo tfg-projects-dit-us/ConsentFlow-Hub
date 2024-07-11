@@ -3,12 +3,36 @@ Aplicación web para la gestión de consentimientos médicos, creada utilizando 
 
 
 ## Ejecución
-Para ejecutar la aplicación basta con ejecutar el script "launch.sh" del proyecto gestorconsentimientos-service:
+Para ejecutar la aplicación empresarial basta con ejecutar el script "launch" del proyecto gestorconsentimientos-service (".sh" para linux, ".bat" para windows):
 
 ```shell
-./launch.sh clean install
+./launch.sh clean install -Ppostgres
 ```
-Se puede comprobar el funcionamiento de la aplicación desde la url "http://localhost:8090/".
+La aplicación, está configurada para tratar con un servidor Hapi Fhir en la url "http://localhost:8080/fhir/", para lo que se puede desplegar utilizando el fichero "docker-compose.yaml" que hay en la carpeta "fhirServer" del repositorio. Otra opción es modificar el fichero de configuración y utilizar un servidor hapi fhir público o que tenga otra dirección.
+
+La aplicación también tiene configurada en el fichero de configuración "application.properties" el uso de una BBDD postgresql en la dirección "localhost" y en el puerto "5432". Es posible desplegar el servidor postgresql utilizando una aplicación de escritorio o terminal, o por el contrario utilizando un contenedor docker, para lo que se puede utilizar el fichero "docker-compose.yaml" de la carpeta postgresql.Es posible modificar la dirección y puerto de la BBDD postgresql, o incluso modificar la BBDD que se utiliza, para lo que es necesario indicar el perfil maven adecuado "-P<perfil>", para que el proyecto maven cuente con las dependencias necesarias.
+
+Es posible arrancar todo de manera conjunta desde un script (start.sh) para linux que hay en el directorio raíz del proyecto, o por el contrario ejecutar cada componente por separado:
+
+```bash
+# Acceso al directorio raíz del repositorio
+cd GestorConsentimientos/
+
+# Ejecución del servidor Fhir (la opción '-d' lo ejecuta en segundo plano)
+cd ./fhirServer/
+sudo docker-compose up -d
+
+# Publicación del recurso fhir de tipo Questionnaire que utiliza la aplicación empresarial (al ser el primero tiene id=1, lo que se utiliza para obtenerlo desde la aplicación)
+# Esperar a que el contenedor haya arrancado
+./fhir_save_questionnaire.sh
+
+# Ejecución del servidor postgresql
+cd ./postgresql
+sudo docker-compose up -d 
+
+```
+
+Una vez se haya arrancado todo, se puede proceder a probar el funcionamiento de la aplicación desde la url "http://localhost:8090/".
 
 ### EndPoints
 Los recursos disponibles a los que atiende la aplicación son los siguientes.

@@ -1,0 +1,25 @@
+---
+
+services:
+  jbpm_db:
+    image: postgres
+    container_name: jbpm_db
+    ports:
+      - 5432:5432
+    shm_size: 128mb # set shared memory limit when using docker-compose
+    # [README] Al descomentar esta sección, se consigue persistencia de los datos de la BBDD
+    #volumes:
+    #  - data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: consentimientos
+      POSTGRES_USER: jbpm
+      POSTGRES_PASSWORD: jbpm
+    restart: no
+
+  # Servicio en el puerto 3000 que permite conectarse a la BBDD de postgresql, utilizando la dirección jbpm_db y el puerto 5432, al estar dentro de la misma red docker.
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - 3000:8080
+    restart: no
