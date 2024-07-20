@@ -248,9 +248,13 @@ public class KieConsentService {
                 (QueryParam) null,
                 new QueryContext());
         
+        System.out.println("processInstanceParentDescList");
+        System.out.println(processInstanceParentDescList);
         for (ProcessInstanceWithVarsDesc pi:processInstanceParentDescList){
             processInstanceIdRequestList.add(pi.getId());
         }
+        System.out.println("processInstanceIdRequestList");
+        System.out.println(processInstanceIdRequestList);
 
         // Evita una excepción en caso de que no haya ningún proceso aún
         if (!processInstanceIdRequestList.isEmpty()){
@@ -271,13 +275,17 @@ public class KieConsentService {
                             }},
                     null,
                     null,
-                    (QueryParam) null,
+                    (List<String>) null,
                     new QueryContext());
+            System.out.println("processInstanceDescList");
+            System.out.println(processInstanceDescList);
             if (!processInstanceDescList.isEmpty()){
                 // Obtención de las variables que forman parte de cada consentimiento
                 for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
 
                     processInstanceVars = processInstanceDesc.getVariables();
+                    System.out.println("processInstanceVars");
+                    System.out.println(processInstanceVars);
 
                     if (processInstanceVars != null){
                         consentsList.add(new RequestedConsent(

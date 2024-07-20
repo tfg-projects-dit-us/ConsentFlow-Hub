@@ -173,7 +173,7 @@ public class PractitionerController {
         
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         formResponse = request.getParameterMap();
-        patientList = Arrays.asList(formResponse.get("patients")[0].split(";"));
+        patientList = Arrays.asList(formResponse.get("patients")[0].split(","));
         questionnaireResponse = mapToQuestionnaireResponseMapper.map(formResponse);
         questionnaireResponse.setServer(fhirServer);
         requestQuestionnarieResponseId = fhirDAO.save(questionnaireResponse);
