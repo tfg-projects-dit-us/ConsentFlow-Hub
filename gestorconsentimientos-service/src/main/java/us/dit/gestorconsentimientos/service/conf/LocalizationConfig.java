@@ -28,7 +28,7 @@ public class LocalizationConfig implements WebMvcConfigurer {
 		lr.setDefaultLocale(new Locale("es", "ES"));
 		return lr;
 	}
-
+	
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
