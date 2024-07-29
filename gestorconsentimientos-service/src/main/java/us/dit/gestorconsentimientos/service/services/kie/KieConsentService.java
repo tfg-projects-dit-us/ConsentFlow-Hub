@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryResultMapper;
@@ -30,7 +32,7 @@ import us.dit.gestorconsentimientos.model.ReviewedConsent;
 public class KieConsentService {
 
     // https://docs.jbpm.org/7.74.1.Final/jbpm-docs/html_single/#service-runtime-data-con_jbpm-doc
-    
+	private static final Logger logger = LogManager.getLogger();
     @Autowired
 	private AdvanceRuntimeDataService advancedRuntimeDataService;
     
@@ -65,7 +67,7 @@ public class KieConsentService {
             new QueryContext());
         
         if (processInstanceDescList.size() != 0) {
-            
+        	logger.info("Se han encontrado "+processInstanceDescList.size()+" consentimientos");
             processInstanceDesc = processInstanceDescList.get(0);
             
             processInstanceVars = processInstanceDesc.getVariables();
@@ -100,7 +102,7 @@ public class KieConsentService {
             new QueryContext());
         
         if (processInstanceDescList.size() != 0) {
-            
+        	logger.info("Se han encontrado "+processInstanceDescList.size()+" revisiones");
             processInstanceDesc = processInstanceDescList.get(0);
             
             processInstanceVars = processInstanceDesc.getVariables();
@@ -227,6 +229,7 @@ public class KieConsentService {
      *                     pendientes de revisar, que se quieren obtener
      */
     public List <RequestedConsent> getRequestedConsentsByPractitioner(String practitioner){
+    	logger.info("Buscando los consentimientos pendientes de "+practitioner);
 
         List<ProcessInstanceWithVarsDesc> processInstanceParentDescList = null;
         List<Long> processInstanceIdRequestList = new ArrayList<Long>();;
@@ -258,7 +261,7 @@ public class KieConsentService {
 
         // Evita una excepción en caso de que no haya ningún proceso aún
         if (!processInstanceIdRequestList.isEmpty()){
-
+        	logger.info("Se han encontrado "+processInstanceParentDescList.size()+" solicitudes");
             // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
             // por <practitioner>, y que tienen su tarea humana sin completar
             processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(
@@ -310,7 +313,8 @@ public class KieConsentService {
      * @param practitioner facultativo que solicitó los consentimientos que se quieren obtener
      */
     public List <ReviewedConsent> getConsentsByPractitioner(String practitioner){
-
+    	logger.info("Obteniendo los consentimientos pendientes de "+practitioner);
+    	
         List<ProcessInstanceWithVarsDesc> processInstanceParentDescList = null;
         List<Long> processInstanceIdRequestList = new ArrayList<Long>();;
         List<ProcessInstanceWithVarsDesc> processInstanceDescList = null;
@@ -339,7 +343,7 @@ public class KieConsentService {
 
         // Evita una excepción en caso de que no haya ningún proceso aún
         if (!processInstanceIdRequestList.isEmpty()){
-
+        	logger.info("Se han encontrado "+processInstanceParentDescList.size()+" solicitudes");
             // Lista de instancias de procesos "ConsentReview", cuyos padres fueron iniciados
             // por <practitioner>
             processInstanceDescList = advancedRuntimeDataService.queryProcessByVariablesAndTask(

@@ -75,8 +75,11 @@ public class WebSecurityConfig {
 
 		UserDetails facultativo = User.withUsername("medico").password(encoder.encode("medico")).roles("kie-server", "FACULTATIVO").build();
 		UserDetails paciente = User.withUsername("paciente").password(encoder.encode("paciente")).roles("kie-server", "PACIENTE").build();
+		UserDetails paciente2 = User.withUsername("paciente2").password(encoder.encode("paciente")).roles("kie-server", "PACIENTE").build();
+		UserDetails paciente3 = User.withUsername("paciente3").password(encoder.encode("paciente")).roles("kie-server", "PACIENTE").build();
+		UserDetails paciente4 = User.withUsername("paciente4").password(encoder.encode("paciente")).roles("kie-server", "PACIENTE").build();
 
-		return new InMemoryUserDetailsManager(wbadmin, user, kieserver, consentimientos, facultativo, paciente);
+		return new InMemoryUserDetailsManager(wbadmin, user, kieserver, consentimientos, facultativo, paciente, paciente2, paciente3, paciente4);
 	}
 
 	@Bean

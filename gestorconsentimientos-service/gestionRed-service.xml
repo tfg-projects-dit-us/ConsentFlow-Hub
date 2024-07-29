@@ -3,11 +3,6 @@
   <configuration>
     <configItems>
       <config-item>
-        <name>org.kie.server.bypass.auth.user</name>
-        <value>true</value>
-        <type>java.lang.String</type>
-      </config-item>
-      <config-item>
         <name>org.kie.server.location</name>
         <value>http://localhost:8090/rest/server</value>
         <type>java.lang.String</type>
@@ -18,8 +13,13 @@
         <type>java.lang.String</type>
       </config-item>
       <config-item>
+        <name>org.kie.server.user</name>
+        <value>gestionRed</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
         <name>org.kie.server.id</name>
-        <value>gestorconsentimientos-service</value>
+        <value>gestionRed-service</value>
         <type>java.lang.String</type>
       </config-item>
       <config-item>
@@ -27,15 +27,25 @@
         <value></value>
         <type>java.lang.String</type>
       </config-item>
+      <config-item>
+        <name>org.kie.server.bypass.auth.user</name>
+        <value>true</value>
+        <type>java.lang.String</type>
+      </config-item>
+      <config-item>
+        <name>org.kie.server.pwd</name>
+        <value>gestionRed</value>
+        <type>java.lang.String</type>
+      </config-item>
     </configItems>
   </configuration>
   <containers>
     <container>
-      <containerId>gestorconsentimientos-kjar</containerId>
+      <containerId>gestionRed-kjar-1_0-SNAPSHOT</containerId>
       <releaseId>
         <groupId>us.dit</groupId>
-        <artifactId>gestorconsentimientos-kjar</artifactId>
-        <version>1.0</version>
+        <artifactId>gestionRed-kjar</artifactId>
+        <version>1.0-SNAPSHOT</version>
       </releaseId>
       <status>STARTED</status>
       <scanner>
@@ -64,7 +74,7 @@
         </config-item>
       </configItems>
       <messages/>
-      <containerAlias>gestorconsentimientos-kjar</containerAlias>
+      <containerAlias>gestionRed-kjar</containerAlias>
     </container>
   </containers>
 </kie-server-state>

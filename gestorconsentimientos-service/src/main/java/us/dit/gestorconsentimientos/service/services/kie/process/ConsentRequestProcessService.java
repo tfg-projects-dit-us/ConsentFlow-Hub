@@ -54,7 +54,7 @@ public class ConsentRequestProcessService {
     @Value("${kie.deployment.version}")
     private String deploymentVersion;
     
-    @Value("${kie.process.ConsentRequest.id}")
+    @Value("${kie.process.ConsentRequest.name}")
 	private String processId;
 
 	@Value("${kie.user}")
@@ -111,25 +111,30 @@ public class ConsentRequestProcessService {
     /**
      * Método que va a crear una instancia del proceso. 
      * Para ello va a crear una unidad de despliegue.
-     * 
-     * @param params parámetros de entrada para el proceso
+     *       
+     * @param params parámetros de entrada para el proceso 
      * @return (Long) processInstanceId
      */
     public Long createProcessInstance(Map<String,Object> params){
-        
+    	 logger.info("Entrando en el metodo para crear una instancia de proceso");
         Long processInstanceId = null;
 
         // Despliegue de los activos de negocio
-        deployBusinessAssests();
+       // deployBusinessAssests();
 
 
         // Instanciación del proceso
-        processInstanceId = processService.startProcess(deploymentUnitId, processId, params);
+        //si la invocación se hace desde PractitionerController sólo contiene "practitioner", el nombre del usuario
+        processInstanceId = processService.startProcess("gestorconsentimientos-kjar", processId, params);
         logger.info("> Desplegada instancia de proceso ConsentRequest con ID: " + processInstanceId);
-        logger.info(processService.getProcessInstance(deploymentUnitId, processInstanceId));
-        logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).toString());
-        logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).getInitiator());
-        logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).getState());
+        
+        /**
+         * No pongas código en los logs, si da error ese código en lugar de ayudar a descubrir errores los introducen...
+         */
+        //logger.info(processService.getProcessInstance(deploymentUnitId, processInstanceId));
+        //logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).toString());
+        //logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).getInitiator());
+        //logger.info(runtimeDataService.getProcessInstanceById(processInstanceId).getState());
         
         return processInstanceId;
     }
@@ -142,8 +147,8 @@ public class ConsentRequestProcessService {
      *                          iniciar la tarea de solicitud de consentimiento.
      * @return (Map <String, Object>) vars - variables necesarias para la ejecución de la tarea humana
      */
-    public Map <String, Object> initRequestTask(Long processInstanceId){
-        
+    public Map <String, Object> initRequestTask(Long processInstanceId,String practitioner){
+        logger.info("INICIANDO tarea en el proceso "+processInstanceId);
         String fhirServer = null;
         Long requestQuestionnaireId = null;
         Map <String, Object> vars = new HashMap<String,Object>();
@@ -159,7 +164,9 @@ public class ConsentRequestProcessService {
         // la tarea, de sus variables de entrada. Hay que tener claro que cada enfoque puede tener sus pros y 
         // contras, y que implicará distintos caminos e información previa
         fhirServer = (String) processService.getProcessInstanceVariable(processInstanceId, "fhirServer");
+        logger.info("Obteniendo la variable fhirServer del proceso "+fhirServer);
         requestQuestionnaireId = (Long) processService.getProcessInstanceVariable(processInstanceId, "requestQuestionnaireId");
+        logger.info("Obteniendo la variable id del cuestionario del proceso "+requestQuestionnaireId);
         vars.put("fhirServer",fhirServer);
         vars.put("requestQuestionnaireId",requestQuestionnaireId);
 
@@ -172,6 +179,9 @@ public class ConsentRequestProcessService {
         workItemInstanceList = processService.getWorkItemByProcessInstance(processInstanceId);
         workItemInstance = workItemInstanceList.stream().filter(wi->wi.getParameter("TaskName").equals("ConsentRequestGeneration")).collect(Collectors.toList()).get(0);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
+        
+        
+        userTaskService.start(userTaskInstanceDesc.getTaskId(),practitioner);
 
         // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
         // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
@@ -188,6 +198,7 @@ public class ConsentRequestProcessService {
         // La primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
         // pero el resto de veces que se acceda a este método tratando de iniciar la tarea, el usuario al que le 
         // corresponde llevarla a cabo será el paciente.
+        /*
         if (userTaskInstanceDesc.getActualOwner().equals(defaultPotentialOwner)){
             userTaskService.delegate(userTaskInstanceDesc.getTaskId(), defaultPotentialOwner, baDefaultUser);
         }
@@ -196,7 +207,7 @@ public class ConsentRequestProcessService {
         if (!userTaskInstanceDesc.getStatus().equals(Status.InProgress.toString())){
             userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser);
         }
-
+        */
         
         return vars;
     }
@@ -208,7 +219,7 @@ public class ConsentRequestProcessService {
      *                          completar la tarea de solicitud de consentimiento.
      * @param results variables que se han generado al realizar la tarea.
      */
-    public void completeRequestTask(Long processInstanceId, Map <String, Object> results){
+    public void completeRequestTask(Long processInstanceId, Map <String, Object> results, String practitioner){
 
         WorkItem workItemInstance = null;
         UserTaskInstanceDesc userTaskInstanceDesc = null;
@@ -220,7 +231,7 @@ public class ConsentRequestProcessService {
         //processService.completeWorkItem(workItemInstance.getId(), results);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
         
-        userTaskService.complete(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser, results);
+        userTaskService.complete(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), practitioner, results);
     }
 
 }

@@ -116,15 +116,17 @@ public class PractitionerController {
         // Instanciación del proceso de solicitud de consentimiento
         params.put("practitioner",userDetails.getUsername());
         processInstanceId = consentRequestProcess.createProcessInstance(params);
-        logger.info("+ processInstanceId: " + processInstanceId);
+        logger.info("Vuelvo al controlador con processInstanceId: " + processInstanceId+" que meto en los datos de session");
+        
         httpSession.setAttribute("processInstanceId", processInstanceId);
               
-        // Obtención del cuestionario a mostrar
-        vars = consentRequestProcess.initRequestTask(processInstanceId);
+        // Obtención del cuestionario a mostrar e inicio de la tarea
+        vars = consentRequestProcess.initRequestTask(processInstanceId,userDetails.getUsername());
+        
         fhirServer = (String) vars.get("fhirServer");
         requestQuestionnaireId = (Long) vars.get("requestQuestionnaireId");
-        logger.info("+ fhirServer: " + fhirServer);
-        logger.info("+ requestQuestionnaireId: " + requestQuestionnaireId);
+        logger.info("+ fhirServer: ", fhirServer);
+        logger.info("+ requestQuestionnaireId: ", requestQuestionnaireId);
         httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("requestQuestionnaireId", requestQuestionnaireId);
         requestQuestionnarie = fhirDAO.get(fhirServer, "Questionnaire", requestQuestionnaireId);
@@ -160,6 +162,12 @@ public class PractitionerController {
 
         logger.info("IN --- POST /facultativo/solicitud");
 
+        Authentication auth = null;
+        UserDetails userDetails = null;
+        // Obtención del usuario que opera sobre el recurso para toda la sesión
+        auth = SecurityContextHolder.getContext().getAuthentication();
+        userDetails = (UserDetails) auth.getPrincipal();
+        
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
         FhirDTO requestQuestionnarie = fhirDAO.get(
@@ -181,7 +189,7 @@ public class PractitionerController {
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
         results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
         results.put("patientList",patientList);
-        consentRequestProcess.completeRequestTask(processInstanceId, results);
+        consentRequestProcess.completeRequestTask(processInstanceId, results, userDetails.getUsername());
         logger.info("+ requestQuestionnarieResponseId: " + requestQuestionnarieResponseId);
         logger.info("+ patientList: " + patientList);
         

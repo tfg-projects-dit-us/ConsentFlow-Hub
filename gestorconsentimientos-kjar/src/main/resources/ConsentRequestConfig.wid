@@ -6,7 +6,8 @@
     ], 
     "results" : [ 
         "fhirServer" : new StringDataType(), 
-        "requestQuestionnaireId" : new ObjectDataType("java.lang.Long")
+        "requestQuestionnaireId" : new ObjectDataType("java.lang.Long"),
+        "practitioner" : new StringDataType()
     ],
     "displayName" : "ConsentRequestConfig", 
     "icon" : "" 

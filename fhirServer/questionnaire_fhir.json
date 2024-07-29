@@ -8,12 +8,12 @@
     "type": "group",
     "item": [ {
       "linkId": "patients",
-      "text": "Who do we ask for consent?",
+      "text": "¿A quién se le solicita este consentimiento?",
       "type": "string",
       "required": true
     }, {
       "linkId": "1.2",
-      "text": "What are we asking for?",
+      "text": "¿Cuál es la finalidad de las acciones que sobre las que se está solicitando permiso?",
       "type": "coding",
       "required": true,
       "answerOption": [ {
@@ -104,17 +104,17 @@
       } ]
     }, {
       "linkId": "1.3",
-      "text": "For how long is it requested?",
+      "text": "¿Cuánto tiempo durará este permiso?",
       "type": "date",
       "required": true
     }, {
       "linkId": "1.4",
-      "text": "Who is it for?",
+      "text": "¿A quién se le va a conceder permiso?",
       "type": "string",
       "required": true
     }, {
       "linkId": "1.5",
-      "text": "What is to be done with this information?",
+      "text": "¿Qué se va a permitir hacer con este permiso?",
       "type": "coding",
       "required": true,
       "answerOption": [ {
@@ -151,21 +151,21 @@
     } ]
   }, {
     "linkId": "2",
-    "text": "Optional fields",
+    "text": "Campos opcionales",
     "type": "group",
     "item": [ {
       "linkId": "2.1",
-      "text": "Time period of information?",
+      "text": "Fecha de la información a la que se accederá",
       "type": "date",
       "required": false
     }, {
       "linkId": "2.2",
-      "text": "Type of information?",
+      "text": "Tipo de información a la que se accederá",
       "type": "string",
       "required": false
     }, {
       "linkId": "2.3",
-      "text": "Type of FHIR resource requested?",
+      "text": "Tipo de recurso FHIR al que se accederá",
       "type": "coding",
       "required": false,
       "answerOption": [ {
@@ -339,7 +339,7 @@
       } ]
     }, {
       "linkId": "2.4",
-      "text": "Specific resource identifier?",
+      "text": "Identificador del recurso concreto",
       "type": "string",
       "required": false
     } ]
