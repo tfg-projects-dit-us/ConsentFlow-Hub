@@ -1,6 +1,5 @@
 package us.dit.gestorconsentimientos.service.services.kie.process;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,16 +7,11 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
-import org.jbpm.services.api.model.DeployedUnit;
-import org.jbpm.services.api.model.DeploymentUnit;
-import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.api.task.model.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,9 +26,6 @@ import org.springframework.stereotype.Service;
 public class ConsentRequestProcessService {
 
 	private static final Logger logger = LogManager.getLogger();
-
-    @Autowired
-    private DeploymentService deploymentService;
 
     @Autowired
     private ProcessService processService;
@@ -62,51 +53,6 @@ public class ConsentRequestProcessService {
 	
     @Value("${kie.task.potentialOwner}")
 	private String defaultPotentialOwner;
-
-    private String deploymentUnitId;
-
-    //TODO Convertir esta función en un patrón factory...
-    // Al hacer esto, no serán necesarios en este fichero el grupo, id ni version, además de
-    // hacer posible que el deploymentUnitId sea devuelto por el servicio correspondiente. 
-    private void deployBusinessAssests(){
-
-        DeploymentUnit deploymentUnit = null;
-        Collection<DeployedUnit> deployedUnitList = null;
-        String GAV = deploymentGroupId + ":" + deploymentArtifactId + ":" + deploymentVersion;
-        
-        // Obtención de una lista de unidades de despliegue disponibles     
-        deployedUnitList = this.deploymentService.getDeployedUnits();
-        
-        // Filtrado de la lista de unidades de despliegue a aquellas que estén activas y que tengan como identificador GAV. 
-        // Se da por sentado que siempre se sigue este esquema para el nombrado de la unidad de despliegue.
-        deployedUnitList = deployedUnitList.stream().filter(
-            deployedUnit->(deployedUnit.isActive() && deployedUnit.getDeploymentUnit().getIdentifier().equals(GAV))).collect(Collectors.toList());
-        
-        
-        if (deployedUnitList.iterator().hasNext()){
-            // En caso de haber alguna que cumpla el filtrado anterior, se obtiene su ID y se fija.
-            deploymentUnitId = this.deploymentService.getDeployedUnits().iterator().next().getDeploymentUnit().getIdentifier();
-            logger.info("> Localizada de despliegue unidad con ID: " + deploymentUnitId);
-            //TODO ¿Se crean más unidades de despliegue? ¿Es la forma correcta de utilizar siempre la misma?
-            //TODO Tratar de averiguar si se crea una unidad de despliegue al iniciarse la aplicación, sin necesidad de crearla
-            
-        }else{
-            // En caso de no haber ninguna unidad de despliegue con el identificador GAV y que esté activa se crea una.
-            
-            // Cración de la unidad de despliegue que contiene todos los activos de negocio
-            deploymentUnit = new KModuleDeploymentUnit(deploymentGroupId, deploymentArtifactId, deploymentVersion);
-            deploymentUnitId = deploymentUnit.getIdentifier();
-
-            // Despliegue de la unidad de depligue que contiene todos los activos de negocio
-            deploymentService.deploy(deploymentUnit);
-            deploymentService.activate(deploymentUnitId);
-            logger.info("> Desplegada unidad de despliegue con ID: " + deploymentUnitId);
-            //logger.info("¿Está desplegada la unidad con ID " +deploymentUnitId+ "?: " + deploymentService.isDeployed(deploymentUnitId));
-            //Collection<DeployedUnit> deployedUnits = deploymentService.getDeployedUnits();
-            //logger.info("Deployment Units: ");
-            //logger.info(deployedUnits);
-        }
-    }
 
     /**
      * Método que va a crear una instancia del proceso. 

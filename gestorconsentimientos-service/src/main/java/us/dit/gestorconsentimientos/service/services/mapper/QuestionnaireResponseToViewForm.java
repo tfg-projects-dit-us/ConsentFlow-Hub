@@ -73,7 +73,7 @@ public class QuestionnaireResponseToViewForm{
 		String body = null;
 		
 		body = "<body>\r\n"
-				+ "<a class=\"home-link\" href=\"/facultativo/solicitudes/\">Back</a>\r\n"
+				+ "<a class=\"home-link\" href=\"/menu/\">Back</a>\r\n"
 				+"<div class=\"box\">\r\n"
 				+ "<h2>Meta-Questionnaire</h2>\r\n"
 				+ "<form>\r\n";

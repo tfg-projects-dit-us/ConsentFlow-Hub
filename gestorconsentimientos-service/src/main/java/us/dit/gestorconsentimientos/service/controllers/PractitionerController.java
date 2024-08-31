@@ -1,5 +1,6 @@
 package us.dit.gestorconsentimientos.service.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -173,24 +174,29 @@ public class PractitionerController {
         FhirDTO requestQuestionnarie = fhirDAO.get(
             fhirServer, "Questionnaire",(Long) httpSession.getAttribute("requestQuestionnaireId"));
         MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( requestQuestionnarie);
-        Map<String, String[]> formResponse = null; 
         List<String> patientList = null;
         FhirDTO questionnaireResponse = null;
-        Long requestQuestionnarieResponseId = null;
+        List <Long> requestQuestionnarieResponseIdList = new ArrayList<Long>();
         Map <String,Object> results = new HashMap<String,Object>();
         
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
-        formResponse = request.getParameterMap();
-        patientList = Arrays.asList(formResponse.get("patients")[0].split(","));
-        questionnaireResponse = mapToQuestionnaireResponseMapper.map(formResponse);
-        questionnaireResponse.setServer(fhirServer);
-        requestQuestionnarieResponseId = fhirDAO.save(questionnaireResponse);
+        System.out.println("LOG");
+        patientList = Arrays.asList(request.getParameter("patients").split(","));
+        System.out.println(request.getParameter("patients").toString());
+        System.out.println(patientList);
+        
+        for (String patient:patientList){
+            request.setAttribute("patients", patient);
+            questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
+            questionnaireResponse.setServer(fhirServer);
+            requestQuestionnarieResponseIdList.add(fhirDAO.save(questionnaireResponse));
+        }
 
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
-        results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseId);
+        results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseIdList.get(0));
         results.put("patientList",patientList);
         consentRequestProcess.completeRequestTask(processInstanceId, results, userDetails.getUsername());
-        logger.info("+ requestQuestionnarieResponseId: " + requestQuestionnarieResponseId);
+        logger.info("+ requestQuestionnarieResponseId: " + requestQuestionnarieResponseIdList.get(0));
         logger.info("+ patientList: " + patientList);
         
         logger.info("OUT --- POST /facultativo/solicitud");

@@ -1,7 +1,6 @@
 package us.dit.gestorconsentimientos.service.services.kie;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jbpm.services.api.AdvanceRuntimeDataService;
 import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.VariableDesc;
 import org.jbpm.services.api.query.QueryResultMapper;
@@ -113,8 +111,8 @@ public class KieConsentService {
         	logger.info("Se han encontrado "+processInstanceDescList.size()+" revisiones");
             processInstanceDesc = processInstanceDescList.get(0);
             
-            processInstanceVars = runtimeDataService.getVariablesCurrentState(processInstanceDesc.getId()).stream().collect(Collectors.toMap((VariableDesc::getVariableId), VariableDesc::getNewValue));
-    
+            processInstanceVars = processInstanceDesc.getVariables();
+
             reviewedConsent = new ReviewedConsent(
                 (Long) processInstanceDesc.getId(),
                 (String) processInstanceVars.get("fhirServer"),
@@ -250,6 +248,7 @@ public class KieConsentService {
             for (ProcessInstanceWithVarsDesc processInstanceDesc: processInstanceDescList){
 
                 processInstanceVars = runtimeDataService.getVariablesCurrentState(processInstanceDesc.getId()).stream().collect(Collectors.toMap((VariableDesc::getVariableId), VariableDesc::getNewValue));
+
 
                 if (processInstanceVars != null){
                     consentsList.add(new RequestedConsent(
