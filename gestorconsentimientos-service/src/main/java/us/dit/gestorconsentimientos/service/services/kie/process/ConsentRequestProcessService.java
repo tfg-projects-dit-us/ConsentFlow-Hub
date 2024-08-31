@@ -54,7 +54,7 @@ public class ConsentRequestProcessService {
     @Value("${kie.deployment.version}")
     private String deploymentVersion;
     
-    @Value("${kie.process.ConsentRequest.name}")
+    @Value("${kie.process.ConsentRequest.id}")
 	private String processId;
 
 	@Value("${kie.user}")
@@ -225,7 +225,7 @@ public class ConsentRequestProcessService {
         UserTaskInstanceDesc userTaskInstanceDesc = null;
 
         workItemInstance = processService.getWorkItemByProcessInstance(processInstanceId).get(0);
-        
+
         // Al completar el workItem de una tarea humana, la tarea humana no se ve completada, 
         // por lo que es necesario completar la tarea y no el workItem.
         //processService.completeWorkItem(workItemInstance.getId(), results);

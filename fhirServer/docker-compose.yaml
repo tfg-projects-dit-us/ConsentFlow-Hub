@@ -8,4 +8,4 @@ services:
       - 8888:8080
     volumes:
       - ./application.yaml:/app/config/application.yaml
-    restart: yes
+    restart: always

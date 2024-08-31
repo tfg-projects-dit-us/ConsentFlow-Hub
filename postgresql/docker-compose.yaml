@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_DB: consentimientos
       POSTGRES_USER: jbpm
-      POSTGRES_PASSWORD: jbpm
+      POSTGRES_PASSWORD: jbpm.2.DDBB*
     restart: no
 
   # Servicio en el puerto 3000 que permite conectarse a la BBDD de postgresql, utilizando la dirección jbpm_db y el puerto 5432, al estar dentro de la misma red docker.
