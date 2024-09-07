@@ -163,17 +163,19 @@ public class PractitionerController {
 
         logger.info("IN --- POST /facultativo/solicitud");
 
-        Authentication auth = null;
-        UserDetails userDetails = null;
-        // Obtención del usuario que opera sobre el recurso para toda la sesión
-        auth = SecurityContextHolder.getContext().getAuthentication();
-        userDetails = (UserDetails) auth.getPrincipal();
-        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+       
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
         FhirDTO requestQuestionnarie = fhirDAO.get(
             fhirServer, "Questionnaire",(Long) httpSession.getAttribute("requestQuestionnaireId"));
-        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse( requestQuestionnarie);
+        MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse(
+            requestQuestionnarie, 
+            userDetails.getUsername(),
+            "Practitioner",
+            "ConsentRequest");
+
         List<String> patientList = null;
         FhirDTO questionnaireResponse = null;
         List <Long> requestQuestionnarieResponseIdList = new ArrayList<Long>();
@@ -213,13 +215,14 @@ public class PractitionerController {
      * @return "practitioner-request-list" plantilla thymeleaf
      */        
     @GetMapping("/solicitudes")
-    public String getPractitionerRequests(Model model) {
+    public String getPractitionerRequests(HttpSession httpSession, Model model) {
 
         logger.info("IN --- /facultativo/solicitudes");
         
         Authentication auth = null;
         UserDetails userDetails = null;
         List<RequestedConsent> requestConsentList = null;
+        String fhirServer = (String) httpSession.getAttribute("fhirServer");
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -235,6 +238,9 @@ public class PractitionerController {
 
         model.addAttribute("requestConsentList", requestConsentList);
         
+        System.out.println("LOGS _________________________");
+        fhirDAO.searchConsentRequestByPersonAndExtensionTraza(fhirServer, "ConsentRequest", userDetails.getUsername(), "Practitioner");
+
         logger.info("OUT --- /facultativo/solicitudes");
         return "practitioner-request-list";
     }
@@ -288,13 +294,14 @@ public class PractitionerController {
      * @return "practitioner-consent-list" plantilla thymeleaf
      */ 
     @GetMapping("/consentimientos")
-    public String getPractitionerConsents(Model model) {
+    public String getPractitionerConsents(HttpSession httpSession, Model model) {
 
         logger.info("IN --- /facultativo/consentimientos");
 
         Authentication auth = null;
         UserDetails userDetails = null;
         List<ReviewedConsent> consentList = null;
+        String fhirServer = (String) httpSession.getAttribute("fhirServer");
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -309,7 +316,7 @@ public class PractitionerController {
         }
 
         model.addAttribute("consentList", consentList);
-       
+
         logger.info("OUT --- /facultativo/consentimientos");
         return "practitioner-consent-list";
     }

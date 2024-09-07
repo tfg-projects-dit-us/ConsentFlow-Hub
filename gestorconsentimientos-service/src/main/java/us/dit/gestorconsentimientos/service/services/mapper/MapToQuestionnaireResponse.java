@@ -9,12 +9,15 @@ import org.hl7.fhir.r5.model.BooleanType;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
+import org.hl7.fhir.r5.model.Reference;
+import org.hl7.fhir.r5.model.Extension;
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse.QuestionnaireResponseStatus;
 
 import us.dit.gestorconsentimientos.service.model.FhirDTO;
-
+import us.dit.gestorconsentimientos.service.model.FhirDAO;
 import org.hl7.fhir.r5.model.StringType;
+import org.hl7.fhir.r5.model.UriType;
 
 
 /**
@@ -26,9 +29,22 @@ import org.hl7.fhir.r5.model.StringType;
 public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>, FhirDTO> {
 
 	private Questionnaire questionnaire;
+	private String source;
+	private FhirDAO fhirDAO = new FhirDAO();
+	private String server = null;
+	private String role = null;
+	private String tipo_traza = null;
 
-	public MapToQuestionnaireResponse(FhirDTO questionnaire) {
+
+	/*
+	 * Constructor que toma el rol de la persona que responde, siendo este rol el recurso fhir patient o practitioner.
+	 */
+	public MapToQuestionnaireResponse(FhirDTO questionnaire, String source, String role, String tipo_traza) {
 		this.questionnaire =  (Questionnaire) questionnaire.getResource();
+		this.source =  source;
+		this.server = questionnaire.getServer();
+		this.role = role;
+		this.tipo_traza = tipo_traza;
 	}
 
 	@Override
@@ -39,7 +55,17 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 		in = simplifyMap(in);
 
 		response.setStatus(QuestionnaireResponseStatus.COMPLETED);
+		response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
 		response.setQuestionnaire(questionnaire.getId());
+
+		Extension extension_tipo_traza = new Extension();
+		extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
+		extension_tipo_traza.setValue(new StringType(tipo_traza));
+		ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
+		extensions.add(extension_tipo_traza);
+
+		response.setExtension(extensions);
+				
 
 		for (Questionnaire.QuestionnaireItemComponent item : questionnaire.getItem()) {
 			switch (item.getType()) {
@@ -62,9 +88,14 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 		return new FhirDTO(response);
 	}
 
-	private void responseGroup(QuestionnaireResponse response, QuestionnaireItemComponent item,
-		List<QuestionnaireItemComponent> items, Map<String, String[]> results) {
-		List<QuestionnaireResponseItemComponent> example = new ArrayList<QuestionnaireResponse.QuestionnaireResponseItemComponent>();
+	private void responseGroup(
+		QuestionnaireResponse response, 
+		QuestionnaireItemComponent item,
+		List<QuestionnaireItemComponent> items, 
+		Map<String, String[]> results
+		) {
+		
+			List<QuestionnaireResponseItemComponent> example = new ArrayList<QuestionnaireResponse.QuestionnaireResponseItemComponent>();
 
 		for (Questionnaire.QuestionnaireItemComponent it : items) {
 			QuestionnaireResponseItemComponent t = new QuestionnaireResponseItemComponent();

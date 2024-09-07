@@ -195,7 +195,8 @@ public class PatientController {
     public String postPatientConsent(HttpSession httpSession, HttpServletRequest request) {
         
         logger.info("IN --- POST /paciente/consentimiento");
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String fhirServer = (String) httpSession.getAttribute("fhirServer");
         Long reviewQuestionnaireId = (Long) httpSession.getAttribute("reviewQuestionnaireId");
         Long requestQuestionnaireResponseId = (Long) httpSession.getAttribute("requestQuestionnaireResponseId");
@@ -226,7 +227,7 @@ public class PatientController {
 
         if (review == Boolean.TRUE) {
             logger.info("La solicitud de consentimiento ha sido aceptada");
-            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId));
+            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId), userDetails.getUsername(), "Patient", "reviewedConsentRevision");
             reviewQuestionnaireResponse = mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse);
             reviewQuestionnaireResponse.setServer(fhirServer);
             reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
