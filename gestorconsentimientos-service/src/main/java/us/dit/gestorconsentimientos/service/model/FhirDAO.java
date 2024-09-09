@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Questionnaire;
+import org.hl7.fhir.r5.model.IdType;
+import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.Practitioner;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
-
+import org.hl7.fhir.r5.model.UriType;
 import org.springframework.beans.factory.annotation.Value;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -17,6 +19,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
+import us.dit.gestorconsentimientos.model.RequestedConsent;
 
 /**
  * Clase DAO que permite la obtención y persistencia de recursos FHIR. Esta se encarga
@@ -35,6 +38,8 @@ public class FhirDAO {
     private IGenericClient client = null;
 
     public FhirDAO(){
+        // context - create this once, as it's an expensive operation
+        // see http://hapifhir.io/doc_intro.html
         this.ctx = FhirContext.forR5();
     }
 
@@ -60,24 +65,22 @@ public class FhirDAO {
      * Método para obtener un recruso FHIR de un servidor, a partir de su ID.
      * 
      * @param server servidor fhir en el que se encuentra el recurso FHIR
-     * @param resourceType tipo de recurso FHIR que se maneja
-     * @param id identificador del recurso FHIR a obtener
+     * @param url url completa del recurso o tipo de recurso con id
      * @return DTO del recurso fhir que se obtiene
      */
     public FhirDTO get(String server,String url) {
 
 		client = this.ctx.newRestfulGenericClient(server);
-
+        IdType id = new IdType(url);
+        System.out.println(id.getResourceType());
+        System.out.println(id.getIdBase());
         // TODO Extraer el resource Type de la URL....
-        return new FhirDTO(server,client.read().resource(Questionnaire.class).withUrl(url).execute());
+        return new FhirDTO(server,client.read().resource(id.getIdBase()).withId(id.getId()).execute());
     }
 
     public String searchPatientOrPractitionerIdByName(String server, String name, String role) {
 
         String authorId = null;
-        
-        // context - create this once, as it's an expensive operation
-        // see http://hapifhir.io/doc_intro.html
         
         logger.info("searchPatientOrPractitionerIdByName rol=" + role + " name=" + name);
         
@@ -116,19 +119,16 @@ public class FhirDAO {
         return authorId;
     }
 
-    public List<FhirDTO> searchConsentRequestByPersonAndExtensionTraza(
+    public List<RequestedConsent> searchConsentRequestByPersonAndExtensionTraza(
         String server,
         String extension_value,
         String name, 
         String role
         ) {
 
-        List<FhirDTO> resourcesList = null;
+        List<RequestedConsent> resourcesList = null;
         
         logger.info("searchConsentRequestByPersonAndExtensionTraza rol=" + role + " name=" + name + " tipo de traza=" + extension_value);
-        
-        // context - create this once, as it's an expensive operation
-        // see http://hapifhir.io/doc_intro.html
 
         // increase timeouts since the server might be powered down
         // see http://hapifhir.io/doc_rest_client_http_config.html
@@ -153,12 +153,25 @@ public class FhirDAO {
             String authorId = response_patients.getEntry().get(0).getResource().getIdElement().getIdPart();
             logger.info("El ID del " + role + " llamado " + name + " es " + authorId);
 
-            Bundle response_questionnaireResponses = client.search()
-                    .forResource(QuestionnaireResponse.class)
-                    .where(QuestionnaireResponse.QUESTIONNAIRE.hasId(requestConsentQuestionnaireId))
-                    .where(new ReferenceClientParam("source").hasId(authorId))
-                    .returnBundle(Bundle.class)
-                    .execute();
+            Bundle response_questionnaireResponses = null;
+            if (role.equals("Practitioner")){
+                response_questionnaireResponses = client.search()
+                        .forResource(QuestionnaireResponse.class)
+                        .where(QuestionnaireResponse.QUESTIONNAIRE.hasId(requestConsentQuestionnaireId))
+                        .where(new ReferenceClientParam("source").hasId(authorId))
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
+
+            if (role.equals("Patient")){
+                response_questionnaireResponses = client.search()
+                        .forResource(QuestionnaireResponse.class)
+                        .where(QuestionnaireResponse.QUESTIONNAIRE.hasId(requestConsentQuestionnaireId))
+                        .where(new ReferenceClientParam("subject").hasId(authorId))
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
+
             
             logger.info("Encontrados " + response_questionnaireResponses.getTotal() + " rellenados por el " + role + " " + name);
             
@@ -175,15 +188,28 @@ public class FhirDAO {
                     return false;
                 }
             })
-            .map(entry -> new FhirDTO(server, (QuestionnaireResponse) entry.getResource()))
+            .map(entry -> {
+                QuestionnaireResponse resource = (QuestionnaireResponse) entry.getResource();
+                IdType patient_reference = (IdType) resource.getSubject().getReferenceElement();
+                IdType practitioner_reference = (IdType) resource.getSource().getReferenceElement();
+                Patient patient = (Patient) get(server, "Patient", patient_reference.getIdPartAsLong()).getResource();
+                Practitioner practitioner = (Practitioner) get(server, "Practitioner", practitioner_reference.getIdPartAsLong()).getResource();
+                IdType id = new IdType(new UriType(resource.getQuestionnaire()));
+                return new RequestedConsent(
+                    Long.parseLong(resource.getExtensionByUrl("Id_process_instance").getValue().toString()),
+                    server,
+                    Long.parseLong(id.getIdPart()),
+                    Long.parseLong(new IdType(resource.getId()).getIdPart()),
+                    resource.getMeta().getLastUpdated(),
+                    patient.getName().get(0).getText(),
+                    practitioner.getName().get(0).getText()
+                    );
+            })
             .collect(Collectors.toList());
-
             logger.info(resourcesList.size() + " son " + extension_value);
             
-            for (FhirDTO resource: resourcesList){
-                QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) resource.getResource();
-                System.out.println(questionnaireResponse.getId());
-                System.out.println(questionnaireResponse.getAuthor());
+            for (RequestedConsent resource: resourcesList){
+                System.out.println(resource.toString());
             }
 
         } catch (Exception e) {

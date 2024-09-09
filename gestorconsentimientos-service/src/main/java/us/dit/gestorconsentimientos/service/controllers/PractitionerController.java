@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,13 +46,17 @@ public class PractitionerController {
 
 	private static final Logger logger = LogManager.getLogger();
 
-    private static FhirDAO fhirDAO = new FhirDAO();
-
+    
     @Autowired
     private ConsentRequestProcessService consentRequestProcess;
-
+    
     @Autowired
     private KieConsentService kieConsentService;
+    
+    private static FhirDAO fhirDAO = new FhirDAO();
+
+    @Value("${fhirserver.location}")
+	private String fhirServer;
 
     /**
      * Controlador que gestiona las operaciones GET al recurso "/facultativo".
@@ -105,7 +110,6 @@ public class PractitionerController {
         Map<String,Object> params = new HashMap<String,Object>();
         Long processInstanceId = null;
         Map<String,Object> vars = null;
-        String fhirServer = null;
         Long requestQuestionnaireId = null;
         FhirDTO requestQuestionnarie = null;
 
@@ -124,11 +128,9 @@ public class PractitionerController {
         // Obtención del cuestionario a mostrar e inicio de la tarea
         vars = consentRequestProcess.initRequestTask(processInstanceId,userDetails.getUsername());
         
-        fhirServer = (String) vars.get("fhirServer");
         requestQuestionnaireId = (Long) vars.get("requestQuestionnaireId");
         logger.info("+ fhirServer: ", fhirServer);
         logger.info("+ requestQuestionnaireId: ", requestQuestionnaireId);
-        httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("requestQuestionnaireId", requestQuestionnaireId);
         requestQuestionnarie = fhirDAO.get(fhirServer, "Questionnaire", requestQuestionnaireId);
 
@@ -167,14 +169,14 @@ public class PractitionerController {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
        
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
         FhirDTO requestQuestionnarie = fhirDAO.get(
             fhirServer, "Questionnaire",(Long) httpSession.getAttribute("requestQuestionnaireId"));
         MapToQuestionnaireResponse mapToQuestionnaireResponseMapper = new MapToQuestionnaireResponse(
             requestQuestionnarie, 
             userDetails.getUsername(),
             "Practitioner",
-            "ConsentRequest");
+            "ConsentRequest",
+            processInstanceId);
 
         List<String> patientList = null;
         FhirDTO questionnaireResponse = null;
@@ -215,14 +217,13 @@ public class PractitionerController {
      * @return "practitioner-request-list" plantilla thymeleaf
      */        
     @GetMapping("/solicitudes")
-    public String getPractitionerRequests(HttpSession httpSession, Model model) {
+    public String getPractitionerRequests(Model model) {
 
         logger.info("IN --- /facultativo/solicitudes");
         
         Authentication auth = null;
         UserDetails userDetails = null;
         List<RequestedConsent> requestConsentList = null;
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -255,14 +256,13 @@ public class PractitionerController {
      */
     @GetMapping("/solicitudes/{id}")
     @ResponseBody
-    public String getPractitionerRequestById(HttpSession httpSession, @PathVariable Long id) {
+    public String getPractitionerRequestById(@PathVariable Long id) {
         
         logger.info("IN --- /facultativo/solicitudes/"+Long.toString(id));
         
         RequestedConsent requestedConsent = null;
         Long questionnaireResponseId = null;
         FhirDTO questionnaireResponse = null;
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
@@ -294,14 +294,13 @@ public class PractitionerController {
      * @return "practitioner-consent-list" plantilla thymeleaf
      */ 
     @GetMapping("/consentimientos")
-    public String getPractitionerConsents(HttpSession httpSession, Model model) {
+    public String getPractitionerConsents(Model model) {
 
         logger.info("IN --- /facultativo/consentimientos");
 
         Authentication auth = null;
         UserDetails userDetails = null;
         List<ReviewedConsent> consentList = null;
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
 
         // Obtención del usuario que opera sobre el recurso para toda la sesión
         auth = SecurityContextHolder.getContext().getAuthentication();
@@ -332,7 +331,7 @@ public class PractitionerController {
      */
     @GetMapping("/consentimientos/{id}")
     @ResponseBody
-    public String getPractitionerConsentById(HttpSession httpSession, @PathVariable Long id) {
+    public String getPractitionerConsentById(@PathVariable Long id) {
 
         logger.info("IN --- /facultativo/consentimientos/"+Long.toString(id));
         
@@ -341,7 +340,6 @@ public class PractitionerController {
         ReviewedConsent reviewedConsent = null;
         Long questionnaireResponseId = null;
         FhirDTO questionnaireResponse = null;
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 

@@ -115,8 +115,8 @@ public class WebSecurityConfig {
 			if (userDetail.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_FACULTATIVO"))){
 				Practitioner practitioner = new Practitioner();
 				practitioner.addName(new HumanName().setText(userDetail.getUsername())); 
-				
-				if (fhirDAO.searchPatientOrPractitionerIdByName(server,userDetail.getUsername(),"Practitioner") != null){
+				System.out.println(fhirDAO.searchPatientOrPractitionerIdByName(server,userDetail.getUsername(),"Practitioner"));
+				if (fhirDAO.searchPatientOrPractitionerIdByName(server,userDetail.getUsername(),"Practitioner") == null){
 					fhirDAO.save(new FhirDTO(server,practitioner));
 				}
 
@@ -126,7 +126,7 @@ public class WebSecurityConfig {
 				Patient patient = new Patient();
 				patient.addName(new HumanName().setText(userDetail.getUsername())); 
 
-				if (fhirDAO.searchPatientOrPractitionerIdByName(server,userDetail.getUsername(),"Patient") != null){
+				if (fhirDAO.searchPatientOrPractitionerIdByName(server,userDetail.getUsername(),"Patient") == null){
 					fhirDAO.save(new FhirDTO(server,patient));
 				}
 			}			

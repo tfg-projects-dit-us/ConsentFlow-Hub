@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,6 +63,9 @@ public class PatientController {
 
 	@Autowired
 	private QuestionnaireResponseToConsent qrToConsent;
+
+    @Value("${fhirserver.location}")
+	private String fhirServer;
 
     /**
      * Controlador que gestiona las operaciones GET al recurso "/paciente".
@@ -147,7 +151,6 @@ public class PatientController {
         // paciente, en la BA.
         
         Map<String,Object> vars = null;
-        String fhirServer = null;
         Long requestQuestionnaireResponseId = null;
         FhirDTO requestQuestionnaireResponse = null;
         FhirDTO reviewQuestionnaire = null;
@@ -156,7 +159,6 @@ public class PatientController {
 
         // Obtención de la solicitud de consentimiento creada por el facultativo
         vars = consentReviewProcessService.initReviewTask(id); // Sólo funcionará la primera vez
-        fhirServer = (String) vars.get("fhirServer");
         requestQuestionnaireResponseId = (Long) vars.get("requestQuestionnaireResponseId");
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
@@ -165,7 +167,6 @@ public class PatientController {
         reviewQuestionnaire.setServer(fhirServer);
         reviewQuestionnaireId = fhirDAO.save(reviewQuestionnaire);
 
-        httpSession.setAttribute("fhirServer", fhirServer);
         httpSession.setAttribute("reviewQuestionnaireId", reviewQuestionnaireId);
         httpSession.setAttribute("requestQuestionnaireResponseId", requestQuestionnaireResponseId);
         httpSession.setAttribute("processInstanceId", id);
@@ -197,7 +198,6 @@ public class PatientController {
         logger.info("IN --- POST /paciente/consentimiento");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
         Long reviewQuestionnaireId = (Long) httpSession.getAttribute("reviewQuestionnaireId");
         Long requestQuestionnaireResponseId = (Long) httpSession.getAttribute("requestQuestionnaireResponseId");
         Long processInstanceId = (Long) httpSession.getAttribute("processInstanceId");
@@ -227,7 +227,7 @@ public class PatientController {
 
         if (review == Boolean.TRUE) {
             logger.info("La solicitud de consentimiento ha sido aceptada");
-            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId), userDetails.getUsername(), "Patient", "reviewedConsentRevision");
+            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId), userDetails.getUsername(), "Patient", "reviewedConsentRevision", processInstanceId);
             reviewQuestionnaireResponse = mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse);
             reviewQuestionnaireResponse.setServer(fhirServer);
             reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
@@ -299,7 +299,7 @@ public class PatientController {
      */    
     @GetMapping("/consentimientos/{id}")
     @ResponseBody
-    public String getPatientConsentById(HttpSession httpSession, @PathVariable Long id) {
+    public String getPatientConsentById(@PathVariable Long id) {
 
         logger.info("IN --- /paciente/consentimientos/"+Long.toString(id));
 
@@ -308,7 +308,6 @@ public class PatientController {
         ReviewedConsent reviewedConsent = null;
         Long questionnaireResponseId = null;
         FhirDTO questionnaireResponse = null;
-        String fhirServer = (String) httpSession.getAttribute("fhirServer");
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
