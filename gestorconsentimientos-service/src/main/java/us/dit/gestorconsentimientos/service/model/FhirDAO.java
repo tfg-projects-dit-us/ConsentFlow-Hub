@@ -119,16 +119,15 @@ public class FhirDAO {
         return authorId;
     }
 
-    public List<RequestedConsent> searchConsentRequestByPersonAndExtensionTraza(
+    public List<RequestedConsent> searchConsentRequestByPerson(
         String server,
-        String extension_value,
-        String name, 
-        String role
+        String role,
+        String name 
         ) {
 
         List<RequestedConsent> resourcesList = null;
-        
-        logger.info("searchConsentRequestByPersonAndExtensionTraza rol=" + role + " name=" + name + " tipo de traza=" + extension_value);
+        String extension_value = "ConsentRequest";
+        logger.info("searchConsentRequestByPerson rol=" + role + " name=" + name);
 
         // increase timeouts since the server might be powered down
         // see http://hapifhir.io/doc_rest_client_http_config.html
@@ -167,6 +166,106 @@ public class FhirDAO {
                 response_questionnaireResponses = client.search()
                         .forResource(QuestionnaireResponse.class)
                         .where(QuestionnaireResponse.QUESTIONNAIRE.hasId(requestConsentQuestionnaireId))
+                        .where(new ReferenceClientParam("subject").hasId(authorId))
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
+
+            
+            logger.info("Encontrados " + response_questionnaireResponses.getTotal() + " rellenados por el " + role + " " + name);
+            
+            // Se filtra la lista de los recursos obtenidos, para quedarnos solo con los QuestionnaireResponse que representan una solicitud de consentimiento
+            resourcesList = response_questionnaireResponses.getEntry().stream()
+            .filter(entry -> {
+                QuestionnaireResponse resource = (QuestionnaireResponse) entry.getResource();
+                if (resource.hasExtension("Tipo_Traza_Proceso_Solicitud_Consentimiento")){
+                    if (resource.getExtensionByUrl("Tipo_Traza_Proceso_Solicitud_Consentimiento").getValue().toString().equals(extension_value)){
+                        return true;
+                    }
+                    return false;
+                }else{
+                    return false;
+                }
+            })
+            .map(entry -> {
+                QuestionnaireResponse resource = (QuestionnaireResponse) entry.getResource();
+                IdType patient_reference = (IdType) resource.getSubject().getReferenceElement();
+                IdType practitioner_reference = (IdType) resource.getSource().getReferenceElement();
+                Patient patient = (Patient) get(server, "Patient", patient_reference.getIdPartAsLong()).getResource();
+                Practitioner practitioner = (Practitioner) get(server, "Practitioner", practitioner_reference.getIdPartAsLong()).getResource();
+                IdType id = new IdType(new UriType(resource.getQuestionnaire()));
+                return new RequestedConsent(
+                    Long.parseLong(resource.getExtensionByUrl("Id_process_instance").getValue().toString()),
+                    server,
+                    Long.parseLong(id.getIdPart()),
+                    Long.parseLong(new IdType(resource.getId()).getIdPart()),
+                    resource.getMeta().getLastUpdated(),
+                    patient.getName().get(0).getText(),
+                    practitioner.getName().get(0).getText()
+                    );
+            })
+            .collect(Collectors.toList());
+            logger.info(resourcesList.size() + " son " + extension_value);
+            
+            for (RequestedConsent resource: resourcesList){
+                System.out.println(resource.toString());
+            }
+
+        } catch (Exception e) {
+            System.out.println("An error occurred trying to search:");
+            e.printStackTrace();
+        }
+
+        return resourcesList;
+    }
+
+    public List<RequestedConsent> searchConsentRevisionByPerson(
+        String server,
+        String role,
+        String name
+        ) {
+
+        List<RequestedConsent> resourcesList = null;
+        String extension_value = "ConsentRevision"; 
+        logger.info("searchConsentRequestByPersonAndExtensionTraza rol=" + role + " name=" + name);
+
+        // increase timeouts since the server might be powered down
+        // see http://hapifhir.io/doc_rest_client_http_config.html
+        ctx.getRestfulClientFactory().setConnectTimeout(60 * 1000);
+        ctx.getRestfulClientFactory().setSocketTimeout(60 * 1000);
+
+        // create the RESTful client to work with our FHIR server
+        // see http://hapifhir.io/doc_rest_client.html
+        client = this.ctx.newRestfulGenericClient(server);
+
+        try {
+
+            // Realizar la búsqueda del autor (por ejemplo, un Practitioner)
+            Bundle response_patients = client.search()
+                .forResource(role)
+                .where(new StringClientParam("name").matches().value(name))
+                .returnBundle(Bundle.class)
+                .execute();
+
+
+            // Obtener el ID del primer Practitioner encontrado
+            String authorId = response_patients.getEntry().get(0).getResource().getIdElement().getIdPart();
+            logger.info("El ID del " + role + " llamado " + name + " es " + authorId);
+
+            Bundle response_questionnaireResponses = null;
+            if (role.equals("Practitioner")){
+                response_questionnaireResponses = client.search()
+                        .forResource(QuestionnaireResponse.class)
+                        .where(new ReferenceClientParam("questionnaire:not").hasId(requestConsentQuestionnaireId))
+                        .where(new ReferenceClientParam("source").hasId(authorId))
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
+
+            if (role.equals("Patient")){
+                response_questionnaireResponses = client.search()
+                        .forResource(QuestionnaireResponse.class)
+                        .where(new ReferenceClientParam("questionnaire:not").hasId(requestConsentQuestionnaireId))
                         .where(new ReferenceClientParam("subject").hasId(authorId))
                         .returnBundle(Bundle.class)
                         .execute();

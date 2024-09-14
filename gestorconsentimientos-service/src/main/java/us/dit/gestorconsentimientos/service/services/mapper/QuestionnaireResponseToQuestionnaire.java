@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r5.model.Enumerations.PublicationStatus;
+import org.hl7.fhir.r5.model.CanonicalResource;
+import org.hl7.fhir.r5.model.CanonicalType;
+import org.hl7.fhir.r5.model.Extension;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Questionnaire;
@@ -11,6 +14,7 @@ import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemType;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.StringType;
+import org.hl7.fhir.r5.model.UriType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +45,25 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<FhirDTO, Fh
 	@Override
 	public FhirDTO map(FhirDTO in) {
 		Questionnaire questionnaire = null;
-		
-		logger.info(fhirServer);
+		QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) in.getResource();
+
 		this.client = ctx.newRestfulGenericClient(fhirServer);
-		questionnaire = getQuestionnaire( (QuestionnaireResponse) in.getResource());
+		questionnaire = getQuestionnaire(questionnaireResponse);
+		questionnaire.setPublisher(questionnaireResponse.getSource().getId());
+		
+		ArrayList<CanonicalType> canonicalTypes = new ArrayList<CanonicalType>();
+		canonicalTypes.add(new CanonicalType(questionnaireResponse.getId()));
+		questionnaire.setDerivedFrom(canonicalTypes);
+
+		Extension extension_tipo_traza = new Extension();
+		extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
+		extension_tipo_traza.setValue(new StringType("RevisionQuestionnaire"));
+
+		ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
+		extensions.add(extension_tipo_traza);
+		extensions.add(questionnaireResponse.getExtensionByUrl("Id_process_instance"));
+
+		questionnaire.setExtension(extensions);
 		
 		return new FhirDTO(questionnaire);
 	}

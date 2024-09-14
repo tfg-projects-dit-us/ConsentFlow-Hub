@@ -33,19 +33,17 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 	private FhirDAO fhirDAO = new FhirDAO();
 	private String server = null;
 	private String role = null;
-	private String tipo_traza = null;
 	private Long processInstanceId = null;
 
 
 	/*
 	 * Constructor que toma el rol de la persona que responde, siendo este rol el recurso fhir patient o practitioner.
 	 */
-	public MapToQuestionnaireResponse(FhirDTO questionnaire, String source, String role, String tipo_traza, Long processInstanceId) {
+	public MapToQuestionnaireResponse(FhirDTO questionnaire, String source, String role, Long processInstanceId) {
 		this.questionnaire =  (Questionnaire) questionnaire.getResource();
 		this.source =  source;
 		this.server = questionnaire.getServer();
 		this.role = role;
-		this.tipo_traza = tipo_traza;
 		this.processInstanceId = processInstanceId;
 	}
 
@@ -57,23 +55,46 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 		in = simplifyMap(in);
 
 		response.setQuestionnaire(questionnaire.getId());
-		response.setSubject(new Reference("Patient" + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, getParameter(in.get("patients")), "Patient")));
-		response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
 		response.setStatus(QuestionnaireResponseStatus.COMPLETED);
 
-		Extension extension_tipo_traza = new Extension();
-		extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
-		extension_tipo_traza.setValue(new StringType(tipo_traza));
+		Extension questionnaire_tipo_traza = questionnaire.getExtensionByUrl("Tipo_Traza_Proceso_Solicitud_Consentimiento");
 
-		Extension extension_process_instance_id = new Extension();
-		extension_process_instance_id.setUrlElement(new UriType("Id_process_instance"));
-		extension_process_instance_id.setValue(new StringType(this.processInstanceId.toString()));
+		if (questionnaire_tipo_traza.getValue().toString() == "ConsentRequestQuestionnaire") {
+			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
+			response.setSubject(new Reference("Patient" + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, getParameter(in.get("patients")), "Patient")));
+	
+			Extension extension_tipo_traza = new Extension();
+			extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
+			extension_tipo_traza.setValue(new StringType("ConsentRequest"));
+	
+			Extension extension_process_instance_id = new Extension();
+			extension_process_instance_id.setUrlElement(new UriType("Id_process_instance"));
+			extension_process_instance_id.setValue(new StringType(this.processInstanceId.toString()));
+	
+			ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
+			extensions.add(extension_tipo_traza);
+			extensions.add(extension_process_instance_id);
+	
+			response.setExtension(extensions);
 
-		ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
-		extensions.add(extension_tipo_traza);
-		extensions.add(extension_process_instance_id);
+		}
 
-		response.setExtension(extensions);
+		if (questionnaire_tipo_traza.getValue().toString() == "ConsentRevisionQuestionnaire") {
+			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
+			response.setSubject(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
+	
+			Extension extension_tipo_traza = new Extension();
+			extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
+			extension_tipo_traza.setValue(new StringType("ConsentRevision"));
+	
+			ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
+			extensions.add(extension_tipo_traza);
+			extensions.add(questionnaire.getExtensionByUrl("Id_process_instance"));
+	
+			response.setExtension(extensions);
+
+		}		
+
 
 		for (Questionnaire.QuestionnaireItemComponent item : questionnaire.getItem()) {
 			switch (item.getType()) {

@@ -12,12 +12,18 @@ import org.hl7.fhir.r5.model.CodeableConcept;
 import org.hl7.fhir.r5.model.Coding;
 import org.hl7.fhir.r5.model.Consent;
 import org.hl7.fhir.r5.model.Period;
+import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.Reference;
+import org.hl7.fhir.r5.model.StringType;
+import org.hl7.fhir.r5.model.UriType;
 import org.hl7.fhir.r5.model.Consent.ConsentState;
 import org.hl7.fhir.r5.model.Consent.ProvisionDataComponent;
+import org.hl7.fhir.r5.model.Extension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import us.dit.gestorconsentimientos.service.model.FhirDAO;
 import us.dit.gestorconsentimientos.service.model.FhirDTO;
 
 
@@ -32,11 +38,17 @@ public class QuestionnaireResponseToConsent {
 
 	private static final Logger logger = LogManager.getLogger();
 
+	private FhirDAO fhirDAO = new FhirDAO();
+
+	@Value("${fhirserver.location}")
+	private String fhirServer;
+
 	public FhirDTO map(FhirDTO questionnaireResponseDTO) {
 				
 		logger.info("Mapeo de QuestionnaireResponse a Consent");		
 		
 		QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) questionnaireResponseDTO.getResource();
+		Questionnaire questionnaire = (Questionnaire) fhirDAO.get(fhirServer,"QuestionnaireResponse",questionnaireResponse.getIdElement().getIdPartAsLong()).getResource();		
 		Consent consent = null;
 		Consent.ProvisionComponent provision = null;
 		FhirDTO consentDTO = null;
@@ -44,6 +56,29 @@ public class QuestionnaireResponseToConsent {
 		// Creación del consentimiento en estado activo
 		consent = new Consent(ConsentState.ACTIVE);
 		provision = new Consent.ProvisionComponent();
+		
+		// Paciente al que aplica
+		consent.setSubject(questionnaireResponse.getSubject());
+		
+		// QuestionnaireResponse en el que se basa
+		consent.addSourceReference(new Reference(questionnaireResponse.getIdElement()));
+		
+		// Facultativo que lo ha generado
+		List<Reference> referencias = new ArrayList<Reference>();
+		referencias.add(new Reference(questionnaire.getPublisher()));
+		consent.setGrantee(referencias);
+
+		// Extension con lo que representa y el process ID al que está relacionado
+		Extension extension_tipo_traza = new Extension();
+		extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
+		extension_tipo_traza.setValue(new StringType("Consent"));
+
+		ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
+		extensions.add(extension_tipo_traza);
+		extensions.add(questionnaireResponse.getExtensionByUrl("Id_process_instance"));
+
+		consent.setExtension(extensions);
+
 
 		// Establecimiento de la fecha en la que se ha creado el consentimiento (actual)
 		consent.setDate(new Date());

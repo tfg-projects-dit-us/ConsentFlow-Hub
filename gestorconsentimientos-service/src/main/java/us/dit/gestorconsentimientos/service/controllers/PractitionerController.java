@@ -186,11 +186,11 @@ public class PractitionerController {
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
         System.out.println("LOG");
         patientList = Arrays.asList(request.getParameter("patients").split(","));
-        System.out.println(request.getParameter("patients").toString());
         System.out.println(patientList);
         
         for (String patient:patientList){
             request.setAttribute("patients", patient);
+            System.out.println(request.getParameter("patients").toString());
             questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
             questionnaireResponse.setServer(fhirServer);
             requestQuestionnarieResponseIdList.add(fhirDAO.save(questionnaireResponse));
@@ -231,7 +231,8 @@ public class PractitionerController {
         logger.info("+ practitioner: " + userDetails.getUsername());
 
         // Obtención de la lista de solicitudes de consentimiento emitidas por el facultativo
-        requestConsentList = kieConsentService.getRequestedConsentsByPractitioner(userDetails.getUsername());
+        requestConsentList = fhirDAO.searchConsentRequestByPerson(fhirServer,"Practitioner",userDetails.getUsername());
+        //requestConsentList = kieConsentService.getRequestedConsentsByPractitioner(userDetails.getUsername());
         logger.info("Lista de solicitudes de consentimientos emitidas por el facultativo: ");
         for (RequestedConsent reviewedConsent: requestConsentList){
             logger.info(reviewedConsent.toString());    
@@ -239,9 +240,6 @@ public class PractitionerController {
 
         model.addAttribute("requestConsentList", requestConsentList);
         
-        System.out.println("LOGS _________________________");
-        fhirDAO.searchConsentRequestByPersonAndExtensionTraza(fhirServer, "ConsentRequest", userDetails.getUsername(), "Practitioner");
-
         logger.info("OUT --- /facultativo/solicitudes");
         return "practitioner-request-list";
     }

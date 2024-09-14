@@ -115,7 +115,8 @@ public class PatientController {
         logger.info("+ patient: " + userDetails.getUsername());
 
         // Obtención de la lista de solicitudes pendientes
-        requestConsentList = kieConsentService.getRequestedConsentsByPatient(userDetails.getUsername());
+        //requestConsentList = kieConsentService.getRequestedConsentsByPatient(userDetails.getUsername());
+        requestConsentList = fhirDAO.searchConsentRequestByPerson(fhirServer,"Patient",userDetails.getUsername());
         logger.info("Lista de solicitudes de consentimientos emitidas para el paciente: ");
         for (RequestedConsent requestConsent: requestConsentList){
             logger.info(requestConsent.toString());  
