@@ -123,7 +123,8 @@ public class KieConsentService {
                 (String) processInstanceVars.get("patient"),
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")),
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")));
+                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
+                (Long) Long.parseLong("0")); //TODO extraer del proceso
         }
         
         return reviewedConsent;
@@ -211,7 +212,8 @@ public class KieConsentService {
                 (String) processInstanceVars.get("patient"), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review"))));
+                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
+                (Long) Long.parseLong("0"))); //TODO extraer del proceso
         }
 
         return consentsList;
@@ -307,7 +309,8 @@ public class KieConsentService {
                 (String) processInstanceVars.get("patient"), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
-                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review"))));
+                (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
+                (Long) Long.parseLong("0"))); //TODO Extraer del proceso
         }
 
         return consentsList;

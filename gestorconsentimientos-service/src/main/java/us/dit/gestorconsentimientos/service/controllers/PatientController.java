@@ -164,7 +164,7 @@ public class PatientController {
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
         // Generación del cuestionario que el paciente utiliza para revisar la solicitud de consentimiento
-        reviewQuestionnaire = questionnaireResponseToQuestionnaire.map( requestQuestionnaireResponse);
+        reviewQuestionnaire = questionnaireResponseToQuestionnaire.map(requestQuestionnaireResponse);
         reviewQuestionnaire.setServer(fhirServer);
         reviewQuestionnaireId = fhirDAO.save(reviewQuestionnaire);
 
@@ -228,12 +228,11 @@ public class PatientController {
 
         if (review == Boolean.TRUE) {
             logger.info("La solicitud de consentimiento ha sido aceptada");
-            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId), userDetails.getUsername(), "Patient", "reviewedConsentRevision", processInstanceId);
+            mapToQuestionnaireResponse = new MapToQuestionnaireResponse( fhirDAO.get(fhirServer,"Questionnaire", reviewQuestionnaireId), userDetails.getUsername(), "Patient", processInstanceId);
             reviewQuestionnaireResponse = mapToQuestionnaireResponse.map(reviewQuestionnaireFormResponse);
             reviewQuestionnaireResponse.setServer(fhirServer);
             reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
     
-            // TODO Integrar en el proceso de review la creación del recurso consent en una tarea personalizada automática, para que lo haga un WorkItemHandler, y el resultado quede en el motor de procesos, como una variable más, y se pueda obtener junto con el resto de información
             // TODO Modificar la clase del modelo que representa a un consentimiento para que cuente con el recurso consent
             // Generación de un recurso Consent
             FhirDTO consent = qrToConsent.map(fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId));
@@ -278,7 +277,8 @@ public class PatientController {
         logger.info("+ patient: " + userDetails.getUsername());
 
         // Obtención de la lista de consentimientos
-        consentList = kieConsentService.getConsentsByPatient(userDetails.getUsername());
+        //consentList = kieConsentService.getConsentsByPatient(userDetails.getUsername());
+        consentList = fhirDAO.searchConsentReviewByPerson(fhirServer,"Patient",userDetails.getUsername());
         logger.info("Lista de consentimientos otorgados por el paciente: ");
         for (RequestedConsent ReviewedConsent: consentList){
             logger.info(ReviewedConsent.toString());  

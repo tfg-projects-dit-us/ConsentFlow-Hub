@@ -1,6 +1,12 @@
 {
   "resourceType": "Questionnaire",
   "title": "requestQuestionnaire",
+  "extension": [
+    {
+      "url": "Tipo_Traza_Proceso_Solicitud_Consentimiento",
+      "valueString": "ConsentRequestQuestionnaire"
+    }
+  ],
   "status": "active",
   "item": [ {
     "linkId": "1",

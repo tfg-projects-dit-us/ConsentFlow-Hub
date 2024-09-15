@@ -7,11 +7,14 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Consent;
 import org.hl7.fhir.r5.model.IdType;
 import org.hl7.fhir.r5.model.Patient;
 import org.hl7.fhir.r5.model.Practitioner;
+import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
 import org.hl7.fhir.r5.model.UriType;
+import org.hl7.fhir.r5.model.Bundle.BundleEntryComponent;
 import org.springframework.beans.factory.annotation.Value;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -20,6 +23,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import us.dit.gestorconsentimientos.model.RequestedConsent;
+import us.dit.gestorconsentimientos.model.ReviewedConsent;
 
 /**
  * Clase DAO que permite la obtención y persistencia de recursos FHIR. Esta se encarga
@@ -219,15 +223,15 @@ public class FhirDAO {
         return resourcesList;
     }
 
-    public List<RequestedConsent> searchConsentRevisionByPerson(
+    public List<ReviewedConsent> searchConsentReviewByPerson(
         String server,
         String role,
-        String name
+        String name 
         ) {
 
-        List<RequestedConsent> resourcesList = null;
-        String extension_value = "ConsentRevision"; 
-        logger.info("searchConsentRequestByPersonAndExtensionTraza rol=" + role + " name=" + name);
+        List<ReviewedConsent> resourcesList = null;
+        String extension_value = "Consent";
+        logger.info("searchConsentReviewByPerson rol=" + role + " name=" + name);
 
         // increase timeouts since the server might be powered down
         // see http://hapifhir.io/doc_rest_client_http_config.html
@@ -255,29 +259,27 @@ public class FhirDAO {
             Bundle response_questionnaireResponses = null;
             if (role.equals("Practitioner")){
                 response_questionnaireResponses = client.search()
-                        .forResource(QuestionnaireResponse.class)
-                        .where(new ReferenceClientParam("questionnaire:not").hasId(requestConsentQuestionnaireId))
-                        .where(new ReferenceClientParam("source").hasId(authorId))
+                        .forResource(Consent.class)
+                        .where(Consent.GRANTEE.hasId(authorId))
                         .returnBundle(Bundle.class)
                         .execute();
             }
 
             if (role.equals("Patient")){
                 response_questionnaireResponses = client.search()
-                        .forResource(QuestionnaireResponse.class)
-                        .where(new ReferenceClientParam("questionnaire:not").hasId(requestConsentQuestionnaireId))
+                        .forResource(Consent.class)
                         .where(new ReferenceClientParam("subject").hasId(authorId))
                         .returnBundle(Bundle.class)
                         .execute();
             }
 
-            
+
             logger.info("Encontrados " + response_questionnaireResponses.getTotal() + " rellenados por el " + role + " " + name);
             
             // Se filtra la lista de los recursos obtenidos, para quedarnos solo con los QuestionnaireResponse que representan una solicitud de consentimiento
             resourcesList = response_questionnaireResponses.getEntry().stream()
             .filter(entry -> {
-                QuestionnaireResponse resource = (QuestionnaireResponse) entry.getResource();
+                Consent resource = (Consent) entry.getResource();
                 if (resource.hasExtension("Tipo_Traza_Proceso_Solicitud_Consentimiento")){
                     if (resource.getExtensionByUrl("Tipo_Traza_Proceso_Solicitud_Consentimiento").getValue().toString().equals(extension_value)){
                         return true;
@@ -287,27 +289,43 @@ public class FhirDAO {
                     return false;
                 }
             })
-            .map(entry -> {
-                QuestionnaireResponse resource = (QuestionnaireResponse) entry.getResource();
+            .map( (BundleEntryComponent entry) -> {
+                Consent resource = (Consent) entry.getResource();
                 IdType patient_reference = (IdType) resource.getSubject().getReferenceElement();
-                IdType practitioner_reference = (IdType) resource.getSource().getReferenceElement();
+                IdType practitioner_reference = (IdType) resource.getGrantee().get(0).getReferenceElement();
                 Patient patient = (Patient) get(server, "Patient", patient_reference.getIdPartAsLong()).getResource();
                 Practitioner practitioner = (Practitioner) get(server, "Practitioner", practitioner_reference.getIdPartAsLong()).getResource();
-                IdType id = new IdType(new UriType(resource.getQuestionnaire()));
-                return new RequestedConsent(
+
+                IdType consentRevisionQuestionnaireResponseId = new IdType(new UriType(resource.getSourceReference().get(0).getId()));
+                QuestionnaireResponse consentRevisionQuestionnaireResponse = (QuestionnaireResponse) get(server, "QuestionnaireResponse", consentRevisionQuestionnaireResponseId.getIdPartAsLong()).getResource();
+
+                IdType consentRevisionQuestionnaireId = new IdType(new UriType(consentRevisionQuestionnaireResponse.getQuestionnaire()));
+                Questionnaire consentRevisionQuestionnaire = (Questionnaire) get(server, "Questionnaire", consentRevisionQuestionnaireId.getIdPartAsLong()).getResource();
+
+                IdType consentRequestQuestionnaireResponseId = new IdType(new UriType(consentRevisionQuestionnaire.getDerivedFrom().get(0).getId()));
+                QuestionnaireResponse consentRequestQuestionnaireResponse = (QuestionnaireResponse) get(server, "QuestionnaireResponse", consentRequestQuestionnaireResponseId.getIdPartAsLong()).getResource();
+
+                IdType consentRequestQuestionnaireId = new IdType(new UriType(consentRequestQuestionnaireResponse.getQuestionnaire()));
+
+                return new ReviewedConsent(
                     Long.parseLong(resource.getExtensionByUrl("Id_process_instance").getValue().toString()),
                     server,
-                    Long.parseLong(id.getIdPart()),
-                    Long.parseLong(new IdType(resource.getId()).getIdPart()),
-                    resource.getMeta().getLastUpdated(),
+                    consentRequestQuestionnaireId.getIdPartAsLong(),
+                    consentRequestQuestionnaireResponseId.getIdPartAsLong(),
+                    resource.getDate(),
                     patient.getName().get(0).getText(),
-                    practitioner.getName().get(0).getText()
+                    practitioner.getName().get(0).getText(),
+                    consentRevisionQuestionnaireId.getIdPartAsLong(),
+                    consentRevisionQuestionnaireResponseId.getIdPartAsLong(),
+                    true,
+                    Long.parseLong(resource.getIdPart())
                     );
+
             })
             .collect(Collectors.toList());
             logger.info(resourcesList.size() + " son " + extension_value);
             
-            for (RequestedConsent resource: resourcesList){
+            for (ReviewedConsent resource: resourcesList){
                 System.out.println(resource.toString());
             }
 

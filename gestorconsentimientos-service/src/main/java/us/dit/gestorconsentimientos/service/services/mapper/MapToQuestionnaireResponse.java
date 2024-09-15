@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hl7.fhir.r5.model.BooleanType;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemComponent;
@@ -35,6 +37,7 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 	private String role = null;
 	private Long processInstanceId = null;
 
+	private static final Logger logger = LogManager.getLogger();
 
 	/*
 	 * Constructor que toma el rol de la persona que responde, siendo este rol el recurso fhir patient o practitioner.
@@ -59,7 +62,9 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 
 		Extension questionnaire_tipo_traza = questionnaire.getExtensionByUrl("Tipo_Traza_Proceso_Solicitud_Consentimiento");
 
-		if (questionnaire_tipo_traza.getValue().toString() == "ConsentRequestQuestionnaire") {
+		logger.info("Mapper Map - QuestionnaireResponse: " + questionnaire_tipo_traza.getValue().toString());
+
+		if ("ConsentRequestQuestionnaire".equals(questionnaire_tipo_traza.getValue().toString())) {
 			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
 			response.setSubject(new Reference("Patient" + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, getParameter(in.get("patients")), "Patient")));
 	
@@ -79,7 +84,7 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 
 		}
 
-		if (questionnaire_tipo_traza.getValue().toString() == "ConsentRevisionQuestionnaire") {
+		if ("ConsentRevisionQuestionnaire".equals(questionnaire_tipo_traza.getValue().toString())) {
 			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
 			response.setSubject(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
 	

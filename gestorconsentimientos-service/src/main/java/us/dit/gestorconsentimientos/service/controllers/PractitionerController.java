@@ -175,7 +175,6 @@ public class PractitionerController {
             requestQuestionnarie, 
             userDetails.getUsername(),
             "Practitioner",
-            "ConsentRequest",
             processInstanceId);
 
         List<String> patientList = null;
@@ -306,7 +305,8 @@ public class PractitionerController {
         logger.info("+ practitioner: " + userDetails.getUsername());
 
         // Obtención de la lista de consentimientos obtenidos por el facultativo
-        consentList = kieConsentService.getConsentsByPractitioner(userDetails.getUsername());
+        //consentList = kieConsentService.getConsentsByPractitioner(userDetails.getUsername());
+        consentList = fhirDAO.searchConsentReviewByPerson(fhirServer,"Practitioner",userDetails.getUsername());
         logger.info("Lista de consentimientos obtenidos por el facultativo: ");
         for (ReviewedConsent reviewedConsent: consentList){
             logger.info(reviewedConsent.toString());

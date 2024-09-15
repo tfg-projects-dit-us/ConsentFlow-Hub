@@ -12,11 +12,12 @@ import java.util.Date;
 public class ReviewedConsent extends RequestedConsent {
 
     public ReviewedConsent(Long id, String fhirServer, Long requestQuestionnaireId, Long requestQuestionnaireResponseId, Date date,
-            String practitioner, String patient, Long reviewQuestionnaireId, Long reviewQuestionnaireResponseId, Boolean review) {
+            String practitioner, String patient, Long reviewQuestionnaireId, Long reviewQuestionnaireResponseId, Boolean review, Long consentId) {
         super(id, fhirServer, requestQuestionnaireId, requestQuestionnaireResponseId, date, practitioner, patient);
         this.review = review;
         this.reviewQuestionnaireId = reviewQuestionnaireId;
         this.reviewQuestionnaireResponseId = reviewQuestionnaireResponseId;
+        this.consentId = consentId;
     }
 
     protected final Long reviewQuestionnaireId;
@@ -24,6 +25,8 @@ public class ReviewedConsent extends RequestedConsent {
     protected final Long reviewQuestionnaireResponseId;
 
     protected final Boolean review;
+
+    protected final Long consentId;
 
     public Long getReviewQuestionnaireId() {
         return reviewQuestionnaireId;
@@ -47,7 +50,9 @@ public class ReviewedConsent extends RequestedConsent {
         ", patient: " + patient + 
         ", reviewQuestionnaireId: " + reviewQuestionnaireId + 
         ", reviewQuestionnaireResponseId: " + reviewQuestionnaireResponseId + 
-        ", review: " + review ;           
+        ", review: " + review +
+        ", consentId: " + consentId ;
+
     }
  
 }
