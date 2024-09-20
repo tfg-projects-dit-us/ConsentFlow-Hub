@@ -115,8 +115,8 @@ public class PatientController {
         logger.info("+ patient: " + userDetails.getUsername());
 
         // Obtención de la lista de solicitudes pendientes
-        //requestConsentList = kieConsentService.getRequestedConsentsByPatient(userDetails.getUsername());
-        requestConsentList = fhirDAO.searchConsentRequestByPerson(fhirServer,"Patient",userDetails.getUsername());
+        requestConsentList = kieConsentService.getRequestedConsentsByPatient(userDetails.getUsername());
+        //requestConsentList = fhirDAO.searchConsentRequestByPerson(fhirServer,"Patient",userDetails.getUsername());
         logger.info("Lista de solicitudes de consentimientos emitidas para el paciente: ");
         for (RequestedConsent requestConsent: requestConsentList){
             logger.info(requestConsent.toString());  
@@ -159,8 +159,7 @@ public class PatientController {
         String reviewQuestionnarieForm = null;
 
         // Obtención de la solicitud de consentimiento creada por el facultativo
-        Long processInstanceId = kieConsentService.getReviewProcessInstanceIdByRequestQuestionnaireResponseId(id);
-        vars = consentReviewProcessService.initReviewTask(processInstanceId); // Sólo funcionará la primera vez
+        vars = consentReviewProcessService.initReviewTask(id); // Sólo funcionará la primera vez
         requestQuestionnaireResponseId = (Long) vars.get("requestQuestionnaireResponseId");
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
@@ -171,7 +170,7 @@ public class PatientController {
 
         httpSession.setAttribute("reviewQuestionnaireId", reviewQuestionnaireId);
         httpSession.setAttribute("requestQuestionnaireResponseId", requestQuestionnaireResponseId);
-        httpSession.setAttribute("processInstanceId", processInstanceId);
+        httpSession.setAttribute("processInstanceId", id);
 
         reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
 
@@ -278,8 +277,8 @@ public class PatientController {
         logger.info("+ patient: " + userDetails.getUsername());
 
         // Obtención de la lista de consentimientos
-        //consentList = kieConsentService.getConsentsByPatient(userDetails.getUsername());
-        consentList = fhirDAO.searchConsentReviewByPerson(fhirServer,"Patient",userDetails.getUsername());
+        consentList = kieConsentService.getConsentsByPatient(userDetails.getUsername());
+        //consentList = fhirDAO.searchConsentReviewByPerson(fhirServer,"Patient",userDetails.getUsername());
         logger.info("Lista de consentimientos otorgados por el paciente: ");
         for (RequestedConsent ReviewedConsent: consentList){
             logger.info(ReviewedConsent.toString());  
@@ -313,7 +312,7 @@ public class PatientController {
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
-            /*
+
         // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
         reviewedConsent = kieConsentService.getReviewedConsentByConsentReviewInstanceId(id);
 
@@ -327,11 +326,9 @@ public class PatientController {
             result = "ERROR";
         }
 
-         */
         
-        questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", id);
-        
-        result = questionnaireResponseToViewForm.map(questionnaireResponse);
+        //questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", id);
+        //result = questionnaireResponseToViewForm.map(questionnaireResponse);
 
         logger.info("OUT --- /paciente/consentimientos/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent

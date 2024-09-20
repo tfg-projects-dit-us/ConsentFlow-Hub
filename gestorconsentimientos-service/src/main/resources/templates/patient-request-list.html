@@ -29,7 +29,7 @@
                     <td th:text="${requestConsent.getPatient()}">Error</td>
                     <td th:text="${requestConsent.getRequestQuestionnaireId()}">Error</td>
                     <td th:text="${requestConsent.getRequestQuestionnaireResponseId()}">Error</td>	
-                    <td><button class="button" th:data-url="@{/paciente/solicitudes/{id}(id=${requestConsent.getRequestQuestionnaireResponseId()})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.review}"></button></td> 		
+                    <td><button class="button" th:data-url="@{/paciente/solicitudes/{id}(id=${requestConsent.getId()})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.review}"></button></td> 		
                 </tr>
             </tbody>
         </table>
