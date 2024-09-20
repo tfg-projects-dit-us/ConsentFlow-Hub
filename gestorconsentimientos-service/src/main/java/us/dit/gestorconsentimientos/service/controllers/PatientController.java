@@ -159,7 +159,8 @@ public class PatientController {
         String reviewQuestionnarieForm = null;
 
         // Obtención de la solicitud de consentimiento creada por el facultativo
-        vars = consentReviewProcessService.initReviewTask(id); // Sólo funcionará la primera vez
+        Long processInstanceId = kieConsentService.getReviewProcessInstanceIdByRequestQuestionnaireResponseId(id);
+        vars = consentReviewProcessService.initReviewTask(processInstanceId); // Sólo funcionará la primera vez
         requestQuestionnaireResponseId = (Long) vars.get("requestQuestionnaireResponseId");
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
@@ -170,7 +171,7 @@ public class PatientController {
 
         httpSession.setAttribute("reviewQuestionnaireId", reviewQuestionnaireId);
         httpSession.setAttribute("requestQuestionnaireResponseId", requestQuestionnaireResponseId);
-        httpSession.setAttribute("processInstanceId", id);
+        httpSession.setAttribute("processInstanceId", processInstanceId);
 
         reviewQuestionnarieForm = questionnaireToFormPatient.map(reviewQuestionnaire);
 
@@ -312,6 +313,7 @@ public class PatientController {
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
+            /*
         // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
         reviewedConsent = kieConsentService.getReviewedConsentByConsentReviewInstanceId(id);
 
@@ -325,7 +327,12 @@ public class PatientController {
             result = "ERROR";
         }
 
+         */
         
+        questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", id);
+        
+        result = questionnaireResponseToViewForm.map(questionnaireResponse);
+
         logger.info("OUT --- /paciente/consentimientos/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent
         //return "patient-consent-individual" ;

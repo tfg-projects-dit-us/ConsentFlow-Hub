@@ -33,7 +33,7 @@
                     <td th:text="${consent.getRequestQuestionnaireResponseId()}">Error</td>
                     <td th:text="${consent.getReviewQuestionnaireId()}">Error</td>
                     <td th:text="${consent.getReviewQuestionnaireResponseId()}">Error</td>                    
-                    <td><button class="button" th:data-url="@{/facultativo/consentimientos/{id}(id=${consent.id})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
+                    <td><button class="button" th:data-url="@{/facultativo/consentimientos/{id}(id=${consent.reviewQuestionnaireResponseId})}" onclick="window.open(this.getAttribute('data-url'))" th:text="#{table.action.show}"></button></td> 		
                 </tr>
             </tbody>
         </table>

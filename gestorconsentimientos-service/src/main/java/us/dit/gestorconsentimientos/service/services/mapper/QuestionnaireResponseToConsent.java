@@ -20,6 +20,7 @@ import org.hl7.fhir.r5.model.UriType;
 import org.hl7.fhir.r5.model.Consent.ConsentState;
 import org.hl7.fhir.r5.model.Consent.ProvisionDataComponent;
 import org.hl7.fhir.r5.model.Extension;
+import org.hl7.fhir.r5.model.IdType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,7 @@ public class QuestionnaireResponseToConsent {
 		logger.info("Mapeo de QuestionnaireResponse a Consent");		
 		
 		QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) questionnaireResponseDTO.getResource();
-		Questionnaire questionnaire = (Questionnaire) fhirDAO.get(fhirServer,"QuestionnaireResponse",questionnaireResponse.getIdElement().getIdPartAsLong()).getResource();		
+		Questionnaire questionnaire = (Questionnaire) fhirDAO.get(fhirServer,"Questionnaire",new IdType(new UriType(questionnaireResponse.getQuestionnaire())).getIdPartAsLong()).getResource();		
 		Consent consent = null;
 		Consent.ProvisionComponent provision = null;
 		FhirDTO consentDTO = null;
@@ -58,13 +59,20 @@ public class QuestionnaireResponseToConsent {
 		provision = new Consent.ProvisionComponent();
 		
 		// Paciente al que aplica
-		consent.setSubject(questionnaireResponse.getSubject());
+		System.out.println(questionnaireResponse.getSubject().getReference().toString());
 		
+		consent.setSubject(new Reference(questionnaireResponse.getSubject().getReference()));
+		System.out.println(consent.getSubject().toString());
+
+
 		// QuestionnaireResponse en el que se basa
-		consent.addSourceReference(new Reference(questionnaireResponse.getIdElement()));
+		consent.addSourceReference(new Reference(questionnaireResponse.getIdElement().getId()));
 		
 		// Facultativo que lo ha generado
 		List<Reference> referencias = new ArrayList<Reference>();
+		
+		System.out.println(questionnaire.getPublisher());
+		
 		referencias.add(new Reference(questionnaire.getPublisher()));
 		consent.setGrantee(referencias);
 

@@ -263,6 +263,8 @@ public class PractitionerController {
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
+
+        /*
         // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
         requestedConsent = kieConsentService.getRequestedConsentByConsentReviewInstanceId(id);
 
@@ -275,7 +277,12 @@ public class PractitionerController {
             // TODO Poner plantilla de error cuando se implemente la plantilla para la respuesta correcta en lugar de utilizar el mapper
             result = "ERROR";
         }
-        
+         */
+
+        questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", id);
+    
+        result = questionnaireResponseToViewForm.map(questionnaireResponse);
+
         logger.info("OUT --- /facultativo/solicitudes/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre una solicitud de consentimiento, a partir de un recurso FHIR de tipo QuestionnaireResponse
         // return "practitioner-request-individual";
@@ -341,6 +348,7 @@ public class PractitionerController {
         QuestionnaireResponseToViewForm questionnaireResponseToViewForm = new QuestionnaireResponseToViewForm();
         String result = null;
 
+        /*
         // Obtención del ID del questionnaireResponse que es la respuesta al cuestionario con el que un facultativo ha creado una solicitud de consentimiento.
         reviewedConsent = kieConsentService.getReviewedConsentByConsentReviewInstanceId(id);
 
@@ -353,8 +361,11 @@ public class PractitionerController {
             // TODO Poner plantilla de error cuando se implemente la plantilla para la respuesta correcta en lugar de utilizar el mapper
             result = "ERROR";
         }
-
+        */
         
+        questionnaireResponse = fhirDAO.get(fhirServer, "QuestionnaireResponse", id);
+        result = questionnaireResponseToViewForm.map(questionnaireResponse);
+
         logger.info("OUT --- /paciente/consentimientos/"+Long.toString(id));
         //TODO plantilla Thymeleaf que muestre un consentimiento, a partir de un recurso FHIR de tipo Consent        
         

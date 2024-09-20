@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hl7.fhir.r5.model.IdType;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.Questionnaire.QuestionnaireItemAnswerOptionComponent;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
+import org.hl7.fhir.r5.model.UriType;
 import org.springframework.stereotype.Service;
 
 import us.dit.gestorconsentimientos.service.model.FhirDAO;
@@ -78,7 +80,9 @@ public class QuestionnaireResponseToViewForm{
 				+ "<h2>Meta-Questionnaire</h2>\r\n"
 				+ "<form>\r\n";
 		
-		Questionnaire metaQuestionnaire = (Questionnaire) fhirDAO.get(fhirServer,questionnaireResponse.getQuestionnaire()).getResource();
+		Questionnaire metaQuestionnaire = (Questionnaire) fhirDAO.get(
+			fhirServer,"Questionnaire",
+			new IdType(new UriType(questionnaireResponse.getQuestionnaire())).getIdPartAsLong()).getResource();
 		
 		for (Questionnaire.QuestionnaireItemComponent item : metaQuestionnaire.getItem()) {
 			QuestionnaireResponse.QuestionnaireResponseItemComponent it = null;

@@ -57,6 +57,26 @@ public class KieConsentService {
     @Value("${spring.datasource.url}")
     private String dataSource;
 
+
+    public Long getReviewProcessInstanceIdByRequestQuestionnaireResponseId(Long requestQuestionnaireResponseId){
+
+        List<ProcessInstanceWithVarsDesc> processInstanceDescList = null;
+
+        processInstanceDescList = advancedRuntimeDataService.queryProcessByVariables(
+            new ArrayList<QueryParam>(){{ 
+                    add(QueryParam.equalsTo(AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID, (String) processConsentReviewId));
+                    //add(QueryParam.equalsTo(QueryResultMapper.COLUMN_PARENTID parentProcessInstanceId));
+                    //add(QueryParam.equalsTo(QueryResultMapper.COLUMN_PARENTPROCESSINSTANCEID parentProcessInstanceId));
+                    }},
+            new ArrayList<QueryParam>(){{ 
+                add(QueryParam.equalsTo("requestQuestionnaireResponseId", (String) requestQuestionnaireResponseId.toString()));
+                    }},
+            new QueryContext());
+
+        return processInstanceDescList.get(0).getId();
+        
+    }
+
     public RequestedConsent getRequestedConsentByConsentReviewInstanceId(Long processInstanceId){
         
         List<ProcessInstanceWithVarsDesc> processInstanceDescList = null;
@@ -124,7 +144,7 @@ public class KieConsentService {
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")),
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
                 (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
-                (Long) Long.parseLong("0")); //TODO extraer del proceso
+                (Long) Long.parseLong("0")); //TODO extraer del proceso el ID del consentimiento generado a partir de reviewQuestionnaireResponseId
         }
         
         return reviewedConsent;
@@ -213,7 +233,7 @@ public class KieConsentService {
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
                 (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
-                (Long) Long.parseLong("0"))); //TODO extraer del proceso
+                (Long) Long.parseLong("0"))); //TODO extraer del proceso el ID del consentimiento generado a partir de reviewQuestionnaireResponseId
         }
 
         return consentsList;
@@ -310,7 +330,7 @@ public class KieConsentService {
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireId")), 
                 (Long) Long.parseLong( (String) processInstanceVars.get("reviewQuestionnaireResponseId")),
                 (Boolean) Boolean.parseBoolean( (String) processInstanceVars.get("review")),
-                (Long) Long.parseLong("0"))); //TODO Extraer del proceso
+                (Long) Long.parseLong("0"))); //TODO Extraer del proceso el ID del consentimiento generado a partir de reviewQuestionnaireResponseId
         }
 
         return consentsList;

@@ -13,6 +13,7 @@ import org.hl7.fhir.r5.model.Patient;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.hl7.fhir.r5.model.Questionnaire;
 import org.hl7.fhir.r5.model.QuestionnaireResponse;
+import org.hl7.fhir.r5.model.Reference;
 import org.hl7.fhir.r5.model.UriType;
 import org.hl7.fhir.r5.model.Bundle.BundleEntryComponent;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,7 +80,9 @@ public class FhirDAO {
         System.out.println(id.getResourceType());
         System.out.println(id.getIdBase());
         // TODO Extraer el resource Type de la URL....
-        return new FhirDTO(server,client.read().resource(id.getIdBase()).withId(id.getId()).execute());
+        logger.info("LOG");
+        logger.info(id.getIdBase().toString());
+        return new FhirDTO(server,client.read().resource(id.getIdBase().toString()).withId(id.getId()).execute());
     }
 
     public String searchPatientOrPractitionerIdByName(String server, String name, String role) {
@@ -256,32 +259,36 @@ public class FhirDAO {
             String authorId = response_patients.getEntry().get(0).getResource().getIdElement().getIdPart();
             logger.info("El ID del " + role + " llamado " + name + " es " + authorId);
 
-            Bundle response_questionnaireResponses = null;
+            Bundle response = null;
             if (role.equals("Practitioner")){
-                response_questionnaireResponses = client.search()
+                response = client.search()
                         .forResource(Consent.class)
-                        .where(Consent.GRANTEE.hasId(authorId))
+                        //.where(Consent.GRANTEE.hasId(authorId))
+                        //.where(new StringClientParam("grantee.display").matches().value(name))
+                        .where(new StringClientParam("_has:grantee:display").matches().value(name))
                         .returnBundle(Bundle.class)
                         .execute();
             }
 
             if (role.equals("Patient")){
-                response_questionnaireResponses = client.search()
+                response = client.search()
                         .forResource(Consent.class)
-                        .where(new ReferenceClientParam("subject").hasId(authorId))
+                        //.where(new StringClientParam("_has:subject:display").matches().value(name))
+                        //.where(new StringClientParam("subject.display").matches().value(name))
                         .returnBundle(Bundle.class)
                         .execute();
             }
 
 
-            logger.info("Encontrados " + response_questionnaireResponses.getTotal() + " rellenados por el " + role + " " + name);
+            logger.info("Encontrados " + response.getTotal() + " rellenados por el " + role + " " + name);
             
             // Se filtra la lista de los recursos obtenidos, para quedarnos solo con los QuestionnaireResponse que representan una solicitud de consentimiento
-            resourcesList = response_questionnaireResponses.getEntry().stream()
+            resourcesList = response.getEntry().stream()
             .filter(entry -> {
                 Consent resource = (Consent) entry.getResource();
                 if (resource.hasExtension("Tipo_Traza_Proceso_Solicitud_Consentimiento")){
                     if (resource.getExtensionByUrl("Tipo_Traza_Proceso_Solicitud_Consentimiento").getValue().toString().equals(extension_value)){
+                       
                         return true;
                     }
                     return false;
@@ -291,10 +298,9 @@ public class FhirDAO {
             })
             .map( (BundleEntryComponent entry) -> {
                 Consent resource = (Consent) entry.getResource();
-                IdType patient_reference = (IdType) resource.getSubject().getReferenceElement();
-                IdType practitioner_reference = (IdType) resource.getGrantee().get(0).getReferenceElement();
-                Patient patient = (Patient) get(server, "Patient", patient_reference.getIdPartAsLong()).getResource();
-                Practitioner practitioner = (Practitioner) get(server, "Practitioner", practitioner_reference.getIdPartAsLong()).getResource();
+                
+                System.out.println(resource.getSubject().getDisplay());
+                System.out.println(resource.getGrantee().get(0).getDisplay());
 
                 IdType consentRevisionQuestionnaireResponseId = new IdType(new UriType(resource.getSourceReference().get(0).getId()));
                 QuestionnaireResponse consentRevisionQuestionnaireResponse = (QuestionnaireResponse) get(server, "QuestionnaireResponse", consentRevisionQuestionnaireResponseId.getIdPartAsLong()).getResource();
@@ -307,14 +313,16 @@ public class FhirDAO {
 
                 IdType consentRequestQuestionnaireId = new IdType(new UriType(consentRequestQuestionnaireResponse.getQuestionnaire()));
 
+                
+
                 return new ReviewedConsent(
                     Long.parseLong(resource.getExtensionByUrl("Id_process_instance").getValue().toString()),
                     server,
                     consentRequestQuestionnaireId.getIdPartAsLong(),
                     consentRequestQuestionnaireResponseId.getIdPartAsLong(),
                     resource.getDate(),
-                    patient.getName().get(0).getText(),
-                    practitioner.getName().get(0).getText(),
+                    resource.getSubject().getDisplay(),
+                    resource.getGrantee().get(0).getDisplay(),
                     consentRevisionQuestionnaireId.getIdPartAsLong(),
                     consentRevisionQuestionnaireResponseId.getIdPartAsLong(),
                     true,

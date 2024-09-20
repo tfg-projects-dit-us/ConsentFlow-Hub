@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hl7.fhir.r5.model.Enumerations.PublicationStatus;
-import org.hl7.fhir.r5.model.CanonicalResource;
 import org.hl7.fhir.r5.model.CanonicalType;
 import org.hl7.fhir.r5.model.Extension;
 import org.apache.logging.log4j.LogManager;
@@ -57,7 +56,7 @@ public class QuestionnaireResponseToQuestionnaire implements IMapper<FhirDTO, Fh
 
 		Extension extension_tipo_traza = new Extension();
 		extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
-		extension_tipo_traza.setValue(new StringType("RevisionQuestionnaire"));
+		extension_tipo_traza.setValue(new StringType("ConsentRevisionQuestionnaire"));
 
 		ArrayList<org.hl7.fhir.r5.model.Extension> extensions = new ArrayList<Extension>();
 		extensions.add(extension_tipo_traza);
