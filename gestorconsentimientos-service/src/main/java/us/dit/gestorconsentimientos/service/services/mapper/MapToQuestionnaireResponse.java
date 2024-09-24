@@ -65,9 +65,10 @@ public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>
 		logger.info("Mapper Map - QuestionnaireResponse: " + questionnaire_tipo_traza.getValue().toString());
 
 		if ("ConsentRequestQuestionnaire".equals(questionnaire_tipo_traza.getValue().toString())) {
-			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));
-			response.setSubject(new Reference("Patient" + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, getParameter(in.get("patients")), "Patient")));
-	
+			response.setSource(new Reference(this.role + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, source, this.role)));	
+			// No funciona cuando hay más de un paciente....
+			//response.setSubject(new Reference("Patient" + "/" + fhirDAO.searchPatientOrPractitionerIdByName(this.server, getParameter(in.get("patients")), "Patient")));
+
 			Extension extension_tipo_traza = new Extension();
 			extension_tipo_traza.setUrlElement(new UriType("Tipo_Traza_Proceso_Solicitud_Consentimiento"));
 			extension_tipo_traza.setValue(new StringType("ConsentRequest"));

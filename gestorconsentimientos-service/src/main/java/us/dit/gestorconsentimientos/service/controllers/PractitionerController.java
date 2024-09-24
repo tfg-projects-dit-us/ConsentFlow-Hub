@@ -187,19 +187,21 @@ public class PractitionerController {
         patientList = Arrays.asList(request.getParameter("patients").split(","));
         System.out.println(patientList);
         
-        for (String patient:patientList){
-            request.setAttribute("patients", patient);
-            System.out.println(request.getParameter("patients").toString());
-            questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
-            questionnaireResponse.setServer(fhirServer);
-            requestQuestionnarieResponseIdList.add(fhirDAO.save(questionnaireResponse));
-        }
+        //for (String patient:patientList){
+        //    request.setAttribute("patients", patient);
+        //    System.out.println(request.getParameter("patients").toString());
+        //    questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
+        //    questionnaireResponse.setServer(fhirServer);
+        //    requestQuestionnarieResponseIdList.add(fhirDAO.save(questionnaireResponse));
+        //}
+        questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
+        questionnaireResponse.setServer(fhirServer);
 
         // Finalizalización de la tarea humana que corresponde a contestar al cuestionario
-        results.put("requestQuestionnaireResponseId",requestQuestionnarieResponseIdList.get(0));
+        results.put("requestQuestionnaireResponseId",fhirDAO.save(questionnaireResponse));
         results.put("patientList",patientList);
         consentRequestProcess.completeRequestTask(processInstanceId, results, userDetails.getUsername());
-        logger.info("+ requestQuestionnarieResponseId: " + requestQuestionnarieResponseIdList.get(0));
+        logger.info("+ requestQuestionnarieResponseId: " + results.get("requestQuestionnaireResponseId"));
         logger.info("+ patientList: " + patientList);
         
         logger.info("OUT --- POST /facultativo/solicitud");

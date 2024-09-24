@@ -59,10 +59,10 @@ public class QuestionnaireResponseToConsent {
 		provision = new Consent.ProvisionComponent();
 		
 		// Paciente al que aplica
-		System.out.println(questionnaireResponse.getSubject().getReference().toString());
+		//System.out.println(questionnaireResponse.getSubject().getReference().toString());
 		
-		consent.setSubject(new Reference(questionnaireResponse.getSubject().getReference()));
-		System.out.println(consent.getSubject().toString());
+		//consent.setSubject(new Reference(questionnaireResponse.getSubject().getReference()));
+		//System.out.println(consent.getSubject().toString());
 
 
 		// QuestionnaireResponse en el que se basa
