@@ -25,7 +25,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
  * partir de un recurso Fhir de tipo Questionnaire, para que un facultativo genere
  * una solicitud de consentimiento.
  * 
- * @author Jose Antonio
+ * @author Jose Antonio García Linares
  */
 @Service
 public class QuestionnaireToFormPractitioner implements IMapper<FhirDTO, String> {

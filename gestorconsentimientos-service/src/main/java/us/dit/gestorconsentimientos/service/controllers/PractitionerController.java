@@ -179,21 +179,11 @@ public class PractitionerController {
 
         List<String> patientList = null;
         FhirDTO questionnaireResponse = null;
-        List <Long> requestQuestionnarieResponseIdList = new ArrayList<Long>();
         Map <String,Object> results = new HashMap<String,Object>();
         
         // Procesado de la respuesta al cuestionario que asiste en la creación de una solicitud de consentimiento
-        System.out.println("LOG");
         patientList = Arrays.asList(request.getParameter("patients").split(","));
-        System.out.println(patientList);
         
-        //for (String patient:patientList){
-        //    request.setAttribute("patients", patient);
-        //    System.out.println(request.getParameter("patients").toString());
-        //    questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
-        //    questionnaireResponse.setServer(fhirServer);
-        //    requestQuestionnarieResponseIdList.add(fhirDAO.save(questionnaireResponse));
-        //}
         questionnaireResponse = mapToQuestionnaireResponseMapper.map(request.getParameterMap());
         questionnaireResponse.setServer(fhirServer);
 

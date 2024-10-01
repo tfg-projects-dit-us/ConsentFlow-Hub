@@ -233,7 +233,7 @@ public class PatientController {
             reviewQuestionnaireResponse.setServer(fhirServer);
             reviewQuestionnaireResponseId = fhirDAO.save(reviewQuestionnaireResponse);
     
-            // TODO Modificar la clase del modelo que representa a un consentimiento para que cuente con el recurso consent
+            // TODO Modificar el proceso review questionnaire para que cuente con un id de recurso consent junto con la respuesta (review)
             // Generación de un recurso Consent
             FhirDTO consent = qrToConsent.map(fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId));
             consent.setServer(fhirServer);

@@ -12,7 +12,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
  * partir de un recurso Fhir de tipo Questionnaire, para que un paciente acepte o 
  * rechace una solicitud de consentimiento.
  * 
- * @author Jose Antonio
+ * @author Jose Antonio García Linares
  */
 public class QuestionnaireToFormPatient implements IMapper<FhirDTO, String> {
 

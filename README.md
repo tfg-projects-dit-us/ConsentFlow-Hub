@@ -8,7 +8,7 @@ Para ejecutar la aplicación empresarial basta con ejecutar el script "launch" d
 ```shell
 ./launch.sh clean install -Ppostgres
 ```
-La aplicación, está configurada para tratar con un servidor Hapi Fhir en la url "http://localhost:8080/fhir/", para lo que se puede desplegar utilizando el fichero "docker-compose.yaml" que hay en la carpeta "fhirServer" del repositorio. Otra opción es modificar el fichero de configuración y utilizar un servidor hapi fhir público o que tenga otra dirección.
+La aplicación, está configurada para tratar con un servidor Hapi Fhir en la url "http://localhost:8888/fhir/", para lo que se puede desplegar utilizando el fichero "docker-compose.yaml" que hay en la carpeta "fhirServer" del repositorio. Otra opción es modificar el fichero de configuración y utilizar un servidor hapi fhir público o que tenga otra dirección.
 
 La aplicación también tiene configurada en el fichero de configuración "application.properties" el uso de una BBDD postgresql en la dirección "localhost" y en el puerto "5432". Es posible desplegar el servidor postgresql utilizando una aplicación de escritorio o terminal, o por el contrario utilizando un contenedor docker, para lo que se puede utilizar el fichero "docker-compose.yaml" de la carpeta postgresql.Es posible modificar la dirección y puerto de la BBDD postgresql, o incluso modificar la BBDD que se utiliza, para lo que es necesario indicar el perfil maven adecuado "-P<perfil>", para que el proyecto maven cuente con las dependencias necesarias.
 
@@ -31,8 +31,18 @@ cd ./postgresql
 sudo docker-compose up -d 
 
 ```
-
 Una vez se haya arrancado todo, se puede proceder a probar el funcionamiento de la aplicación desde la url "http://localhost:8090/".
+
+En el servidor "http://localhost:8888/" será posible visualizar los recursos FHIR que se hayan ido publicando.
+
+Además, junto con la BBDD se levanta el servicio adminer, en la dirección "http:localhost:3000", a traves del cual es posible acceder de manera muy sencilla y visual a la BBDD postgresql, indicando el tipo de BBDD, la dirección (que al estar dentro del mismo docker compose, se puede utilizar le nombre del contenedor "jbpm_db", con el puerto que tiene abierto), la BBDD, el usuario y la contraseña configuradas en la configuración del contenedor de postgresql.
+
+Algunos de los usuarios activos, disposnibles para poder probar la aplicación, fijados en el fichero "WebSecurityConfig.java" son:
+- user: paciente y facultativo
+- paciente: paciente
+- facultativo: facultativo
+
+Estos tienen como contraseña su mismo usuario.
 
 ### EndPoints
 Los recursos disponibles a los que atiende la aplicación son los siguientes.
@@ -357,7 +367,7 @@ Para que el contenido del proyecto gestorconsentimientos-model esté disponible 
 		</dependency>
 ```
 
-## Gestión del proyecto KJAR
+## Gestión del proyecto KJAR (definición de los recursos BPM como procesos)
 Para poder trabajar con los activos de negocio que va a contener el proyecto "kjar", desde business-central (jbpm), es necesario crear un repositorio de control de versiones git, el cual va a permitir llevar a cabo modificaciones en el proyecto desde la herramienta.
 
 En primer lugar es necesario inicializar el repositorio git:
@@ -377,3 +387,45 @@ Una vez generados activos de negocio desde jbpm, es necesario actualizar la vers
 ```shell
 git pull origin master
 ```
+
+## Instalación de la herramienta JBPM
+
+La versión del servidor JBPM empleado es la 7.74.1, la cual requiere para funcionar java 8, y la aplicación empresarial requiere de la 17.
+
+
+### Instalación de Java
+Es necesario instalar JDK puesto que la aplicación web desarrollada, así como la herramienta Business-Central están escritas en el lenguaje de programación Java.
+
+El puerto por defecto en el que se arranca el servidor es el 8080, de forma que para acceder a el una vez iniciado se deberá acceder a la dirección "http://localhost:8080".
+
+Para comprobar que versión está instalada de JDK y JRE:
+```bash
+java --version
+```
+
+Se van a instalar dos versiones JDK y JRE, una para la ejecución de las Business Application creada utilizando el framework JBPM, y otra para la herramienta Business-Central. Para ello, utilizando el gestor de paquetes apt:
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+
+# Para BA
+sudo apt install openjdk-17-jdk
+sudo apt install openjdk-17-jre
+
+# Para la aplicación Business Central
+sudo apt install openjdk-8-jdk
+sudo apt install openjdk-8-jre
+```
+
+Para comprobar que ambas versiones están disponibles:
+```bash
+update-alternatives --list java
+update-alternatives --list javac
+```
+
+Para comprobar cual es la versión instalada que se va a utilizar por defecto (queremos la 17):
+```bash
+java --version
+```
+
+En caso de estar instalado y experimentar problemas, estos pueden estar relacionados con las variables de entorno definidas por java, y que contienen las rutas de instalación de los diferentes complementos.

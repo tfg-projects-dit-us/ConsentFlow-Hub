@@ -62,12 +62,9 @@ public class ConsentRequestProcessService {
      * @return (Long) processInstanceId
      */
     public Long createProcessInstance(Map<String,Object> params){
-    	 logger.info("Entrando en el metodo para crear una instancia de proceso");
+     
+        logger.info("Entrando en el metodo para crear una instancia de proceso");
         Long processInstanceId = null;
-
-        // Despliegue de los activos de negocio
-       // deployBusinessAssests();
-
 
         // Instanciación del proceso
         //si la invocación se hace desde PractitionerController sólo contiene "practitioner", el nombre del usuario
@@ -128,32 +125,6 @@ public class ConsentRequestProcessService {
         
         
         userTaskService.start(userTaskInstanceDesc.getTaskId(),practitioner);
-
-        // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
-        // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
-        // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va
-        // a ejecutar.
-        
-        // FIXME Buscar si es posible definir el proceso de forma que la tarea quede asignada a un rol, y que cualquier usuario que tenga ese rol pueda trabajar en ella, sin ser necesario modificar el propietario de la tarea.
-        // TODO Investigar si el uso de la opción de arranque -Dorg.kie.server.bypass.auth.user=true podría hacer que cualquier usuario tenga permisos sobre cualquier tarea, sin tener que delegar, y sin tener que asignar usuarios a las tareas.
-
-        // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
-        // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
-        // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va a ejecutar.
-        
-        // La primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
-        // pero el resto de veces que se acceda a este método tratando de iniciar la tarea, el usuario al que le 
-        // corresponde llevarla a cabo será el paciente.
-        /*
-        if (userTaskInstanceDesc.getActualOwner().equals(defaultPotentialOwner)){
-            userTaskService.delegate(userTaskInstanceDesc.getTaskId(), defaultPotentialOwner, baDefaultUser);
-        }
-        
-        // Unicamente se modifica el estado de la tarea en caso de acceder a este método por primera vez, cuando el estado no es Inprogress
-        if (!userTaskInstanceDesc.getStatus().equals(Status.InProgress.toString())){
-            userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser);
-        }
-        */
         
         return vars;
     }

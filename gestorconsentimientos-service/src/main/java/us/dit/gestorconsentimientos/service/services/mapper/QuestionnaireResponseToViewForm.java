@@ -19,7 +19,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
  * Mapper que permite la generación del contenido HTML para mostrar las respuestas de un 
  * formulario a partir de un recurso Fhir de tipo QuestionnaireResponse.
  * 
- * @author Jose Antonio
+ * @author Jose Antonio García Linares
  */
 @Service
 public class QuestionnaireResponseToViewForm{

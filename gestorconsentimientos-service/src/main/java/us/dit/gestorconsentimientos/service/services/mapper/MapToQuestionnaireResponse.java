@@ -26,7 +26,7 @@ import org.hl7.fhir.r5.model.UriType;
  * Mapper que permite la conversión entre la respuesta de un cuestionario HTML, a un 
  * recurso Fhir de tipo QuestionnaireResponse.
  * 
- * @author Jose Antonio
+ * @author Jose Antonio García Linares
  */
 public class MapToQuestionnaireResponse implements IMapper<Map<String, String[]>, FhirDTO> {
 

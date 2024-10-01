@@ -2,6 +2,11 @@ package us.dit.gestorconsentimientos.service.model;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+/**
+ * Clase DTO para los recursos FHIR.
+ * 
+ * @author Javier
+ */
 public class FhirDTO {
     
     private IBaseResource resource;

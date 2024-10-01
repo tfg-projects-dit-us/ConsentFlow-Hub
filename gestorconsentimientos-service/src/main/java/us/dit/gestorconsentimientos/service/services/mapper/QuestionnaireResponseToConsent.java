@@ -32,7 +32,7 @@ import us.dit.gestorconsentimientos.service.model.FhirDTO;
  * Mapper que permite la conversión entre un recurso Fhir de tipo QuestionnaireResponse
  * a uno de tipo Consent.
  * 
- * @author Jose Antonio
+ * @author Jose Antonio García Linares
  */
 @Service
 public class QuestionnaireResponseToConsent {
