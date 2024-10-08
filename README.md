@@ -195,7 +195,7 @@ System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString(
 ```
 
 ##### Tarea humana - "Consent Request Generation"
-<img src="https://github.com/tfg-projects-dit-us/ConsentFlow-Hub/blob/master/gestorconsentimientos-kjar/src/main/resources/gestorconsentimientos-kjar.ConsentRequest-svg.svg"/>
+
 En esta tarea, se utilizan el servidor fhir y el id de cuestionario para presentar el cuestionario seleccionado al facultativo. Cuando este lo rellena, lo entrega con una operación POST al recurso "/facultativo/solicitud", y se almacena la petición, y se genera para cada uno de los pacientes una solicitud de consentimiento.
 
 Las variables que recibe:
