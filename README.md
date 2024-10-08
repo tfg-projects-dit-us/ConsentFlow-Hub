@@ -42,7 +42,7 @@ La supervisión incluye la generación de ideas, la corrección, el desarrollo d
 **Graphical design**
 - Sticker created by Stickers -Flaticon https://www.flaticon.es/stickers-gratis/consentimiento
 
-<a href="https://www.flaticon.es/stickers-gratis/consentimiento" title="consentimiento stickers">Consentimiento stickers creadas por Stickers - Flaticon</a>
+<a href="https://www.flaticon.es/stickers-gratis/consentimiento" title="consentimiento stickers">Sticker de la imagen creado por Stickers - Flaticon</a>
 
 ## Instrucciones de despliegue y ejecución
 Para ejecutar la aplicación empresarial basta con ejecutar el script "launch" del proyecto gestorconsentimientos-service (".sh" para linux, ".bat" para windows):
