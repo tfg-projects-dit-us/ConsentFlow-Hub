@@ -31,6 +31,7 @@ Este proyecto es el resultado del trabajo desarrollado por los alumnos que a con
 
 **Autores:**
 - [Jose Antonio García Linares](https://github.com/josgarlin): desarrolla en su TFG la primera versión del proyecto
+- [Marco Antonio Madonado Orozco](https://github.com/mamaldonado97): desarrolla en su TFG plantillas para la presentación de cuestionarios FHIR
 - [Francisco Javier Ros Raposo](https://github.com/J4V1R6): desarrolla en su TFM la versión actual del proyecto
 
 **Supervisora:**
