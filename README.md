@@ -44,6 +44,18 @@ La supervisión incluye la generación de ideas, la corrección, el desarrollo d
 
 <a href="https://www.flaticon.es/stickers-gratis/consentimiento" title="consentimiento stickers">Sticker de la imagen creado por Stickers - Flaticon</a>
 
+## Contributions
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Do not forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
 ## Instrucciones de despliegue y ejecución
 Para ejecutar la aplicación empresarial basta con ejecutar el script "launch" del proyecto gestorconsentimientos-service (".sh" para linux, ".bat" para windows):
 
