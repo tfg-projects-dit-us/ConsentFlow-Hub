@@ -1,5 +1,7 @@
-# GestorConsentimientos
-Aplicación web para la gestión de consentimientos médicos, creada utilizando el kit de desarrollo JBPM, el cual permite la construcción de aplicaciones que funcionan bajo el paradigma de trabajo BPM.
+ConsentFlow Hub
+=====================================
+
+Plataforma para la gestión de consentimientos médicos, creada utilizando el kit de desarrollo JBPM, que facilita el desarrollo de soluciones conformes al paradigma BPM (Business Process Management)
 
 
 ## Ejecución
