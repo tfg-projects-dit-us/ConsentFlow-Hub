@@ -58,10 +58,10 @@ Es posible arrancar todo de manera conjunta desde un script (start.sh) para linu
 
 ```bash
 # Acceso al directorio raíz del repositorio
-cd GestorConsentimientos/
+cd ConsentFlow-Hub/
 
 # Ejecución del servidor Fhir (la opción '-d' lo ejecuta en segundo plano)
-cd ./fhirServer/
+cd ./Resources/fhirServer/
 sudo docker-compose up -d
 
 # Publicación del recurso fhir de tipo Questionnaire que utiliza la aplicación empresarial (al ser el primero tiene id=1, lo que se utiliza para obtenerlo desde la aplicación)
@@ -69,7 +69,7 @@ sudo docker-compose up -d
 ./fhir_save_questionnaire.sh
 
 # Ejecución del servidor postgresql
-cd ./postgresql
+cd ./Resources/postgresql
 sudo docker-compose up -d 
 
 ```
