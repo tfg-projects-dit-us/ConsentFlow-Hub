@@ -1,10 +1,49 @@
+![GitHub top Language](https://img.shields.io/github/languages/top/tfg-projects-dit-us/ConsentFlow-Hub)
+![GitHub forks](https://img.shields.io/github/forks/tfg-projects-dit-us/ConsentFlow-Hub?style=social)
+![GitHub contributors](https://img.shields.io/github/contributors/tfg-projects-dit-us/ConsentFlow-Hub)
+![GitHub Repo stars](https://img.shields.io/github/stars/tfg-projects-dit-us/ConsentFlow-Hub?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/tfg-projects-dit-us/ConsentFlow-Hub)
+![GitHub watchers](https://img.shields.io/github/watchers/tfg-projects-dit-us/ConsentFlow-Hub)
+![GitHub](https://img.shields.io/github/license/tfg-projects-dit-us/ConsentFlow-Hub)
+
+<img src="https://github.com/tfg-projects-dit-us/ConsentFlow-Hub/blob/master/Resources/img/ConsentFlowIcon.png" width="200" />
+
 ConsentFlow Hub
 =====================================
 
 Plataforma para la gestión de consentimientos médicos, creada utilizando el kit de desarrollo JBPM, que facilita el desarrollo de soluciones conformes al paradigma BPM (Business Process Management)
 
+Actualmente es una versión beta en la que se han incluido sólo las capacidades más elementales
 
-## Ejecución
+Está desarrollado en el Departamento de Ingeniería Telemática de la Universidad de Sevilla
+
+## Licencia
+
+Este proyecto está licenciado bajo los términos de la [Licencia Pública General de GNU (GPL) versión 3](https://www.gnu.org/licenses/gpl-3.0.html).
+
+## License
+
+This project is licensed under the terms of the [GNU General Public License (GPL) version 3](https://www.gnu.org/licenses/gpl-3.0.html).
+
+## Reconocimientos
+
+Este proyecto es el resultado del trabajo desarrollado por los alumnos que a continuación se mencionan, bajo la supervisión de la profesora Isabel Román Martínez.
+
+**Autores:**
+- [Jose Antonio García Linares](https://github.com/josgarlin): desarrolla en su TFG la primera versión del proyecto
+- [Francisco Javier Ros Raposo](https://github.com/J4V1R6): desarrolla en su TFM la versión actual del proyecto
+
+**Supervisora:**
+- [Isabel Román Martínez](https://github.com/Isabel-Roman), Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla
+
+La supervisión incluye la generación de ideas, la corrección, el desarrollo de algunos componentes y la orientación técnica durante todo el proceso de desarrollo.
+
+**Graphical design**
+- Sticker created by Stickers -Flaticon https://www.flaticon.es/stickers-gratis/consentimiento
+
+<a href="https://www.flaticon.es/stickers-gratis/consentimiento" title="consentimiento stickers">Consentimiento stickers creadas por Stickers - Flaticon</a>
+
+## Instrucciones de despliegue y ejecución
 Para ejecutar la aplicación empresarial basta con ejecutar el script "launch" del proyecto gestorconsentimientos-service (".sh" para linux, ".bat" para windows):
 
 ```shell
