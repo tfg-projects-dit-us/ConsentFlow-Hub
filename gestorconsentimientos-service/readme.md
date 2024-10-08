@@ -1,6 +1,4 @@
 ConsentFlow Hub: business application
 =====================================
 
-Aplicación para la gestión de procesos relacionados con el manejo consentimientos en entornos sanitarios
-
-Este módulo contiene los manejadores de tareas de procesos
+Este módulo forma parte de la solución ConsentFlow Hub. Contiene principalmente los manejadores de las tareas de procesos y la interfaz de usuario de la plataforma.
