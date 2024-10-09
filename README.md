@@ -170,30 +170,6 @@ Las variables que rellena:
 - fhirServer
 - requestQuestionnaireId
 
-A su entrada realiza lo siguiente:
-```java
-System.out.println("JBPM -- Entro en la tarea 'Consent Request Config' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
-
-A su salida realiza lo siguiente:
-```java
-System.out.println("JBPM -- Salgo de la tarea 'Consent Request Config' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
-
 ##### Tarea humana - "Consent Request Generation"
 
 En esta tarea, se utilizan el servidor fhir y el id de cuestionario para presentar el cuestionario seleccionado al facultativo. Cuando este lo rellena, lo entrega con una operación POST al recurso "/facultativo/solicitud", y se almacena la petición, y se genera para cada uno de los pacientes una solicitud de consentimiento.
@@ -207,29 +183,6 @@ Las variables que rellena:
 - patientList
 - reviewList
 
-A su entrada realiza lo siguiente:
-```java
-System.out.println("JBPM -- Entro en la tarea 'Consent Request Generation' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
-
-A su salida realiza lo siguiente:
-```java
-System.out.println("JBPM -- Salgo de la tarea 'Consent Request Generation' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
 
 ##### Subproceso - "Multiple Consent Review"
 Para cada uno de los pacientes listados en el cuestionario, se genera un subproceso "ReviewConsent" en el que tienen que leer la solicitud de consentimiento y aceptarla o rechazarla.
@@ -248,30 +201,6 @@ Las variables que recibe:
 Las variables que rellena:
 - reviewList como review
 
-
-A su entrada realiza lo siguiente:
-```java
-System.out.println("JBPM -- Entro en la tarea 'Multiple Consent Review' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
-
-A su salida realiza lo siguiente:
-```java
-System.out.println("JBPM -- Salgo de la tarea 'Multiple Consent Review' del proceso 'ConsentRequest'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patientList: " + kcontext.getVariable("patientList").toString());
-System.out.println("reviewList: " + kcontext.getVariable("reviewList").toString());
-```
 ##### Fin
 El proceso finaliza cuando cada uno de los pacientes listados ha respondido a su solicitud de consentimiento, terminando por consecuencia el subproceso que le correspondía.
 
@@ -304,34 +233,6 @@ Las variables que rellena:
 - reviewQuestionnaireId
 - reviewQuestionnaireResponseId
 - review
-
-A su entrada realiza lo siguiente:
-```java
-System.out.println("JBPM -- Entro en la tarea 'Consent Review Generation' del proceso 'ConsentReview'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patient: " + kcontext.getVariable("patient").toString());
-System.out.println("reviewQuestionnaireId: " + kcontext.getVariable("reviewQuestionnaireId").toString());
-System.out.println("reviewQuestionnaireResponseId: " + kcontext.getVariable("reviewQuestionnaireResponseId").toString());
-System.out.println("review: " + kcontext.getVariable("review").toString());
-```
-
-A su salida realiza lo siguiente:
-```java
-System.out.println("JBPM -- Salgo de la tarea 'Consent Review Generation' del proceso 'ConsentReview'.");
-
-System.out.println("fhirServer: " + kcontext.getVariable("fhirServer").toString());
-System.out.println("requestQuestionnaireId: " + kcontext.getVariable("requestQuestionnaireId").toString());
-System.out.println("requestQuestionnaireResponseId: " + kcontext.getVariable("requestQuestionnaireResponseId").toString());
-System.out.println("practitioner: " + kcontext.getVariable("practitioner").toString());
-System.out.println("patient: " + kcontext.getVariable("patient").toString());
-System.out.println("reviewQuestionnaireId: " + kcontext.getVariable("reviewQuestionnaireId").toString());
-System.out.println("reviewQuestionnaireResponseId: " + kcontext.getVariable("reviewQuestionnaireResponseId").toString());
-System.out.println("review: " + kcontext.getVariable("review").toString());
-```
 
 ## Generación
 Tal y como queda documentado en la [Documentación Oficial de JBPM](https://docs.jbpm.org/7.74.1.Final/jbpm-docs/html_single/#_sect_BA_create_application), la creación de la aplicación parte por su generación a través de un arquetipo maven:
