@@ -65,12 +65,6 @@ public class ConsentRequestProcessService {
     @Value("${kie.process.ConsentRequest.id}")
 	private String processId;
 
-	@Value("${kie.user}")
-	private String baDefaultUser;
-	
-    @Value("${kie.task.potentialOwner}")
-	private String defaultPotentialOwner;
-
     /**
      * Método que va a crear una instancia del proceso. 
      * Para ello va a crear una unidad de despliegue.

@@ -174,9 +174,11 @@ public class PatientController {
         FhirDTO reviewQuestionnaire = null;
         Long reviewQuestionnaireId = null;
         String reviewQuestionnarieForm = null;
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        
         // Obtención de la solicitud de consentimiento creada por el facultativo
-        vars = consentReviewProcessService.initReviewTask(id); // Sólo funcionará la primera vez
+        vars = consentReviewProcessService.initReviewTask(id, userDetails.getUsername()); // Sólo funcionará la primera vez
         requestQuestionnaireResponseId = (Long) vars.get("requestQuestionnaireResponseId");
         requestQuestionnaireResponse = fhirDAO.get(fhirServer,"QuestionnaireResponse", requestQuestionnaireResponseId);
 
@@ -261,7 +263,7 @@ public class PatientController {
             results.put("reviewQuestionnaireId",reviewQuestionnaireId);
             results.put("reviewQuestionnaireResponseId",reviewQuestionnaireResponseId);
             results.put("review",review);
-            consentReviewProcessService.completeReviewTask(processInstanceId, results);
+            consentReviewProcessService.completeReviewTask(processInstanceId, results, userDetails.getUsername());
             redirect = "redirect:/paciente/consentimientos/";
         }else{
             logger.info("La solicitud de consentimiento ha sido rechazada");
