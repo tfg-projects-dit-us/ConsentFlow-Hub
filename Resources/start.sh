@@ -41,5 +41,5 @@ echo "Publicando el recurso Questionnaire en el servidor Fhir local"
 
 # Arranca la aplicación Gestor de Consentimientos
 echo "Arrancando aplicación Gestor de Consentimientos"
-cd ../gestorconsentimientos-service/
+cd ../../gestorconsentimientos-service/
 ./launch.sh clean install -Ppostgres

@@ -25,9 +25,7 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.api.task.model.Status;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -49,12 +47,6 @@ public class ConsentReviewProcessService {
 
     @Autowired
     private UserTaskService userTaskService;    
-    
-	@Value("${kie.user}")
-	private String baDefaultUser;
-	
-    @Value("${kie.task.potentialOwner}")
-	private String defaultPotentialOwner;
 
     /**
      * Método que para una instancia de proceso va a iniciar la tarea humana de revisión
@@ -64,7 +56,7 @@ public class ConsentReviewProcessService {
      *                          iniciar la tarea de revisión de solicitud de consentimiento.
      * @return (Map <String, Object>) vars - variables necesarias para la ejecución de la tarea humana
      */
-    public Map <String, Object> initReviewTask(Long processInstanceId){
+    public Map <String, Object> initReviewTask(Long processInstanceId, String patient){
         
         String fhirServer = null;
         Long requestQuestionnaireResponseId = null;
@@ -88,26 +80,9 @@ public class ConsentReviewProcessService {
         workItemInstance = processService.getWorkItemByProcessInstance(processInstanceId).get(0);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
 
-        // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
-        // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
-        // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va
-        // a ejecutar.
-                
-        // Se ha asignado por defecto que la tarea tiene que ser ejecutada por el usuario 
-        // defaultPotentialOwner, y por tanto este tiene que cederla al usuario que la va a llevar a cabo.
-        // Ese usuario podrá ser uno genérico para la BA, o el usuario real de la BA que la va a ejecutar.
-        
-        // La primera vez que se inicia la tarea, el usuario al que está asignada es el configurado por defecto, 
-        // pero el resto de veces que se acceda a este método tratando de iniciar la tarea, el usuario al que le 
-        // corresponde llevarla a cabo será el paciente.
-        if (userTaskInstanceDesc.getActualOwner().equals(defaultPotentialOwner)){
-            userTaskService.delegate(userTaskInstanceDesc.getTaskId(), defaultPotentialOwner, baDefaultUser);
-        }
-        
+      
         // Unicamente se modifica el estado de la tarea en caso de acceder a este método por primera vez, cuando el estado no es Inprogress
-        if (!userTaskInstanceDesc.getStatus().equals(Status.InProgress.toString())){
-            userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser);
-        }
+        userTaskService.start(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), patient);
 
         return vars;
     }
@@ -119,7 +94,7 @@ public class ConsentReviewProcessService {
      *                          completar la tarea de revisión de solicitud de consentimiento.
      * @param results variables que se han generado al realizar la tarea.
      */
-    public void completeReviewTask(Long processInstanceId, Map <String, Object> results){
+    public void completeReviewTask(Long processInstanceId, Map <String, Object> results, String patient){
 
         WorkItem workItemInstance = null;
         UserTaskInstanceDesc userTaskInstanceDesc = null;
@@ -131,7 +106,7 @@ public class ConsentReviewProcessService {
         //processService.completeWorkItem(workItemInstance.getId(), results);
         userTaskInstanceDesc = runtimeDataService.getTaskByWorkItemId(workItemInstance.getId());
         
-        userTaskService.complete(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), baDefaultUser, results);
+        userTaskService.complete(userTaskInstanceDesc.getDeploymentId(),userTaskInstanceDesc.getTaskId(), patient, results);
 
     }
 
