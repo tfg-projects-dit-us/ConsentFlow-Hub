@@ -27,15 +27,16 @@ This project is licensed under the terms of the [GNU General Public License (GPL
 
 ## Reconocimientos
 
-Este proyecto es el resultado del trabajo desarrollado por los alumnos que a continuación se mencionan, bajo la supervisión de la profesora Isabel Román Martínez.
+Este proyecto es el resultado del trabajo desarrollado por los alumnos que a continuación se mencionan, bajo la supervisión de los profesores Isabel Román Martínez y Jorge Calvillo Arbizu.
 
 **Autores:**
 - [Jose Antonio García Linares](https://github.com/josgarlin): desarrolla en su TFG la primera versión del proyecto
 - [Marco Antonio Madonado Orozco](https://github.com/mamaldonado97): desarrolla en su TFG plantillas para la presentación de cuestionarios FHIR
 - [Francisco Javier Ros Raposo](https://github.com/J4V1R6): desarrolla en su TFM la versión actual del proyecto
 
-**Supervisora:**
+**Supervisores:**
 - [Isabel Román Martínez](https://github.com/Isabel-Roman), Profesora del Departamento de Ingeniería Telemática de la Universidad de Sevilla
+- Jorge Calvillo Arbizu, Profesor del Departamento de Ingeniería Telemática de la Universidad de Sevilla
 
 La supervisión incluye la generación de ideas, la corrección, el desarrollo de algunos componentes y la orientación técnica durante todo el proceso de desarrollo.
 
